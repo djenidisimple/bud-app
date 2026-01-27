@@ -1,0 +1,92 @@
+<Dialog open={openEdit} onOpenChange={() => { 
+                setOpenEdit(false);
+                setFormData({ name: '', description: '' });
+            }}>
+                <DialogContent className="sm:max-w-[480px] p-6 bg-white dark:bg-gray-800 rounded-md shadow-xl">
+                    <div className="flex justify-between items-center mb-4">
+                        <DialogHeader className="text-left">
+                            <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-gray-100">
+                                <SettingsIcon className="text-blue-500" size={24} />
+                                Modification du Projet
+                            </DialogTitle>
+                            <DialogDescription className="text-gray-600 dark:text-gray-400 mt-1">
+                                Mettez à jour les détails de votre projet.
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
+
+                    <form 
+                        onSubmit={e => { 
+                            e.preventDefault(); 
+                            if (selectedId !== null) { 
+                                updateData(selectedId); 
+                                setOpenEdit(false); 
+                            }
+                            setFormData({ name: '', description: '' }); 
+                        }}
+                        className="space-y-6"
+                    >
+                        <div className="space-y-4">
+                            <div className="flex flex-col">
+                                <Label className="mb-2 font-medium text-gray-700 dark:text-gray-300">Nom du projet</Label>
+                                <Input 
+                                    id="nameProject" 
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                    required
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                                />
+                            </div>
+                            <div className="flex flex-col">
+                                <Label className="mb-2 font-medium text-gray-700 dark:text-gray-300">Description</Label>
+                                <Input 
+                                    type="text"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                    id="description" 
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                                />
+                            </div>
+                        </div>
+                        
+                        {error && (
+                            <div className="bg-red-50 dark:bg-red-950 p-3 rounded-md border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
+                                {error}
+                            </div>
+                        )}
+                        
+                        <Button 
+                            type="button" 
+                            onClick={() => setLoading(true)}
+                            className="w-full py-3 text-white font-semibold rounded-md bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
+                        >
+                            {loading ? 'Enregistrement...' : 'Enregistrer'}
+                        </Button>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTitle>{/**/}</DialogTitle>
+                <DialogContent>
+                    <DialogHeader>Confirmation</DialogHeader>
+                    <p>Voulez-vous vraiment supprimer ce projet ?</p>
+                    <DialogFooter>
+                        <Button 
+                            variant="outline" 
+                            onClick={() => setOpen(false)}
+                        >
+                            Annuler
+                        </Button>
+                        <Button 
+                            className="bg-red-600 text-white" 
+                            onClick={() => {if (selectedId !== null) deleteData(selectedId);setOpen(false);}}
+                        >
+                            Supprimer
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>

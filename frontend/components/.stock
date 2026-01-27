@@ -1,0 +1,5 @@
+setInputsSpend(prev => {
+            const newData = [...prev];
+            newData[id - 1] = { id: id, name: value };
+            return newData;
+        })

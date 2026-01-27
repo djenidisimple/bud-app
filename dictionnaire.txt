@@ -1,0 +1,92 @@
+Dictionnaire de données 
+
+Nom : idAdmin
+Code : IDADMIN
+Type : NUMERIC
+Taille : 100,
+Commentaire : 
+
+Nom : nomAdmin
+Code : NOMADMIN
+Type : VARCHAR
+Taille : 100,
+Commentaire : 
+
+Nom : motDePasse
+Code : MOTDEPASSE
+Type : TEXT
+Taille : ,
+Commentaire : 
+
+Nom : idRes
+Code : IDRES
+Type : NUMERIC
+Taille : 100,
+Commentaire : 
+
+Nom : nomRes
+Code : NOMRES
+Type : VARCHAR
+Taille : 100,
+Commentaire : 
+
+Nom : prixRes
+Code : PRIXRES
+Type : NUMERIC
+Taille : ,
+Commentaire : 
+
+Nom : idDep
+Code : IDDEP
+Type : NUMERIC
+Taille : ,
+Commentaire : 
+
+Nom : nomDep
+Code : NOMDEP
+Type : VARCHAR
+Taille : 100,
+Commentaire : 
+
+Nom : idMot
+Code : IDMOT
+Type : NUMERIC
+Taille : ,
+Commentaire : 
+
+Nom : nomMot
+Code : NOMMOT
+Type : VARCHAR
+Taille : 100,
+Commentaire : 
+
+Nom : prixMot
+Code : PRIXMOT
+Type : NUMERIC
+Taille : ,
+Commentaire : 
+
+Nom : idPro
+Code : IDPRO
+Type : NUMERIC
+Taille : ,
+Commentaire : 
+
+Nom : nomPro
+Code : NOMPRO
+Type : VARCHAR
+Taille : 100,
+Commentaire : 
+
+Nom : dateRes
+Code : DATERES
+Type : DATE
+Taille : ,
+Commentaire : 
+
+Nom : dateDep
+Code : DATEDEP
+Type : DATE
+Taille : ,
+Commentaire : 
+

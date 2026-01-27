@@ -1,0 +1,89 @@
+Route::post('/addRessource', function (Request $request) {
+    $request->validate([
+        'origine' => 'required',
+        'prix' => 'required'
+    ]);
+    $exists = Ressource::where('origine', $request->origine)->exists();
+    if ($exists) {
+        return response()->json(['message' => 'Le nom du ressource existe déjà!', 'status' => 19]);
+    }
+    try {
+        Ressource::create([
+            'origine' => $request->origine,
+            'prix' => $request->prix,
+            'project_id' => 1,
+            'update' => now(),
+        ]);
+        return response()->json(['message' => 'Enregistrement reussite!', 'status' => 201]);
+    } catch (\Throwable $th) {
+        return response()->json(['message' => $th, 'status' => 500]);
+    }
+});
+
+Route::get('/getRessource', function (Request $request) {
+    $request->validate([
+        'id' => 'required|integer',
+    ]);
+    try {
+        $data = Ressource::where('project_id', $request->id)->get();
+        if ($data->isEmpty()) {
+            return response()->json(['message' => 'Aucune ressource trouvée pour ce projet', 'status' => 404]);
+        }
+        return response()->json(['message' => 'ok', 'status' => 200, 'ressource' => $data]);
+    } catch (\Throwable $th) {
+        return response()->json(['message' => $th, 'status' => 500]);
+    }
+}); 
+
+Route::post('/addSpend', function (Request $request) {
+    $request->validate([
+        'name' => 'required',
+    ]);
+    $exists = Depense::where('nameDepence', $request->name)->exists();
+    if ($exists) {
+        return response()->json(['message' => 'Le nom du depence existe déjà!', 'status' => 19]);
+    }
+    try {
+        Depense::create([
+            'nameDepence' => $request->name,
+            'project_id' => 1,
+        ]);
+        return response()->json(['message' => 'Enregistrement reussite!', 'status' => 201]);
+    } catch (\Throwable $th) {
+        return response()->json(['message' => $th, 'status' => 500]);
+    }
+});
+
+Route::post('/addDetail', function (Request $request) {
+    $request->validate([
+        'name' => 'required',
+    ]);
+    try {
+        Detail::create([
+            'nameDetail' => $request->name,
+            'depense_id' => 1,
+            'prix' => 0,
+        ]);
+        return response()->json(['message' => 'Enregistrement reussite!', 'status' => 201]);
+    } catch (\Throwable $th) {
+        return response()->json(['message' => $th, 'status' => 500]);
+    }
+});
+
+Route::post('/addPrendre', function (Request $request) {
+    $request->validate([
+        'detailId' => 'required|integer',
+        'ressourceId' => 'required|integer',
+        'prix' => 'required|integer',
+    ]);
+    try {
+        Prendre::create([
+            'detail_id' => $request->detailId,
+            'ressource_id' => $request->ressourceId,
+            'prix' => $request->prix,
+        ]);
+        return response()->json(['message' => 'Enregistrement reussite!', 'status' => 201]);
+    } catch (\Throwable $th) {
+        return response()->json(['message' => $th, 'status' => 500]);
+    }
+});
