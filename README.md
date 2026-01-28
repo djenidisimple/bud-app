@@ -3,18 +3,20 @@
 ## Cahier des charges
 
 ### Objectif
-Le client souhaite disposer d’un outil permettant un suivi budgétaire efficace et sécurisé pour ses budgets récurrents.
+Le client souhaite disposer d'un outil permettant un suivi budgétaire efficace et sécurisé pour ses budgets récurrents.
+
+**Note :** Pour plus d'informations détaillées sur le cahier des charges, consultez les documents Word et PDF fournis.
 
 ### Exigences fonctionnelles
-- **Gestion des ressources** : Ajouter, modifier et supprimer des ressources financières (revenus, entrées d’argent).
+- **Gestion des ressources** : Ajouter, modifier et supprimer des ressources financières (revenus, entrées d'argent).
 - **Gestion des dépenses** : Ajouter, modifier et supprimer des dépenses.
 - **Calcul automatique** : Calcul en temps réel des montants totaux des ressources, des dépenses et du solde restant.
 - **Statistiques** : Affichage de statistiques claires sur les ressources et les dépenses existantes (graphiques, totaux, répartition).
-- **Authentification** : Accès sécurisé à l’application, réservé uniquement au propriétaire du compte.
+- **Authentification** : Accès sécurisé à l'application, réservé uniquement au propriétaire du compte.
 
 ### Exigences techniques
 - Application web moderne, responsive et intuitive.
-- Backend sécurisé pour la gestion des données et de l’authentification.
+- Backend sécurisé pour la gestion des données et de l'authentification.
 - Technologies : Next.js (Frontend), Laravel (Backend), SQLite.
 
 ---
