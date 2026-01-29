@@ -15,9 +15,6 @@ dist/
 /public/storage
 /storage/*.key
 /bootstrap/cache/
-.env
-.env.local
-.env.*.local
 
 # IDE & Editor
 .vscode/
