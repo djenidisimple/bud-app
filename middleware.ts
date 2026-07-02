@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken, COOKIE_NAME } from '@/lib/auth-edge'
 
-export async function middleware(request: Request) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const token = request.cookies.get(COOKIE_NAME)?.value
+  const token = request.cookies.get(COOKIE_NAME)?.value ?? null
 
   const isAuthRoute = pathname.startsWith('/budget')
   const isLoginRoute = pathname === '/login'

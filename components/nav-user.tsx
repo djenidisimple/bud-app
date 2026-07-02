@@ -32,7 +32,7 @@ import Link from "next/link"
 
 export function NavUser() {
   const { user, logout } = useAuth()
-  const { isMobile } = useSidebar()
+  const { open } = useSidebar()
 
   if (!user) return null
 
@@ -58,7 +58,7 @@ export function NavUser() {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side="right"
             align="end"
             sideOffset={4}
           >

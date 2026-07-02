@@ -43,11 +43,11 @@ interface TableBodySpendProps {
 }
 
 export function TableBodySpend({ spends, details, makes, resources, onAddSpend, onDeleteSpend, onAddDetail, onDeleteDetail, onMakeChange }: TableBodySpendProps) {
-  const getResourceMake = (detailId, resourceId) => {
+  const getResourceMake = (detailId: number, resourceId: number) => {
     return makes.find(m => m.detail_id === detailId && m.resource_id === resourceId)
   }
 
-  const getDetailTotal = (detailId) => {
+  const getDetailTotal = (detailId: number) => {
     return makes
       .filter(m => m.detail_id === detailId)
       .reduce((sum, m) => sum + (Number(m.price_spend) || 0), 0)
