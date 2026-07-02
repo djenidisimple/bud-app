@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  password   String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  projects   Project[]
+}
+
+model Project {
+  id                  Int        @id @default(autoincrement())
+  name_project        String     @unique
+  description_project String     @default("")
+  user_id             Int
+  active              Int        @default(1)
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @default(now()) @updatedAt
+  user                User       @relation(fields: [user_id], references: [id])
+  resources           Resource[]
+  spends              Spend[]
+}
+
+model Resource {
+  id               Int      @id @default(autoincrement())
+  project_id       Int
+  origine_resource String
+  price_resource   Int      @default(0)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now()) @updatedAt
+  project          Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  makes            Make[]
+}
+
+model Spend {
+  id         Int      @id @default(autoincrement())
+  project_id Int
+  name_spend String
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  details    Detail[]
+}
+
+model Detail {
+  id          Int      @id @default(autoincrement())
+  spend_id    Int
+  name_detail String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  spend       Spend    @relation(fields: [spend_id], references: [id], onDelete: Cascade)
+  makes       Make[]
+}
+
+model Make {
+  id          Int      @id @default(autoincrement())
+  detail_id   Int
+  resource_id Int
+  price_spend Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  detail      Detail   @relation(fields: [detail_id], references: [id], onDelete: Cascade)
+  resource    Resource @relation(fields: [resource_id], references: [id], onDelete: Cascade)
+}
