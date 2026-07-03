@@ -21,12 +21,12 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link href="/budget/settings/register">
-            <Button>
+          <Button asChild>
+            <Link href="/budget/settings/register">
               <UserPlus className="mr-2 h-4 w-4" />
               Créer un compte
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

@@ -6,7 +6,7 @@ import { GalleryVerticalEnd } from "lucide-react"
 
 export default function RegisterPage() {
   return (
-    <div className="flex justify-center p-4">
+    <div className="flex min-h-svh items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
