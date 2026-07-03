@@ -4,13 +4,14 @@ import { useState } from "react"
 import { LoginForm } from "@/components/login-form"
 import { RegisterForm } from "@/components/register-form"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { GalleryVerticalEnd } from "lucide-react"
 
 export default function LoginPage() {
   const [mode, setMode] = useState("login")
 
   return (
-    <div className="flex min-h-svh items-center justify-center p-4">
+    <div className="flex min-h-svh items-center justify-center p-4 bg-gradient-to-br from-background to-muted">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
@@ -33,9 +34,9 @@ export default function LoginPage() {
               <LoginForm />
               <p className="text-sm text-muted-foreground mt-4 text-center">
                 Pas encore de compte ?{" "}
-                <button onClick={() => setMode("register")} className="text-primary underline">
+                <Button variant="link" onClick={() => setMode("register")}>
                   S&apos;inscrire
-                </button>
+                </Button>
               </p>
             </>
           ) : (
@@ -43,9 +44,9 @@ export default function LoginPage() {
               <RegisterForm onSuccess={() => setMode("login")} />
               <p className="text-sm text-muted-foreground mt-4 text-center">
                 Déjà un compte ?{" "}
-                <button onClick={() => setMode("login")} className="text-primary underline">
+                <Button variant="link" onClick={() => setMode("login")}>
                   Se connecter
-                </button>
+                </Button>
               </p>
             </>
           )}

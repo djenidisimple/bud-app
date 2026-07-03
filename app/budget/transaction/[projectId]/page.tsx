@@ -167,7 +167,7 @@ export default function ProjectDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{project.name_project}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{project.name_project}</h1>
           <p className="text-muted-foreground">{project.description_project}</p>
         </div>
         <div className="flex gap-2">
@@ -189,7 +189,7 @@ export default function ProjectDetailPage() {
         <CardHeader className="pb-3">
           <CardTitle>Tableau Budgétaire</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 md:px-6">
           <div className="overflow-auto">
             <Table>
               <TableHeaderComponent
@@ -212,22 +212,22 @@ export default function ProjectDetailPage() {
                 <TableRow>
                   <TableCell className="font-bold">Total Ressources</TableCell>
                   {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-bold text-green-500">
+                    <TableCell key={r.id} className="text-right font-bold text-success">
                       {formatNumber(r.price_resource)} Ar
                     </TableCell>
                   ))}
-                  <TableCell className="text-right font-bold text-green-500">
+                  <TableCell className="text-right font-bold text-success">
                     {formatNumber(resourceTotal)} Ar
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-bold">Total Dépenses</TableCell>
                   {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-bold text-red-500">
+                    <TableCell key={r.id} className="text-right font-bold text-destructive">
                       {formatNumber(r.used)} Ar
                     </TableCell>
                   ))}
-                  <TableCell className="text-right font-bold text-red-500">
+                  <TableCell className="text-right font-bold text-destructive">
                     {formatNumber(spendTotal)} Ar
                   </TableCell>
                 </TableRow>
@@ -235,13 +235,13 @@ export default function ProjectDetailPage() {
                   <TableCell className="font-bold">Restant</TableCell>
                   {remainingResources.map((r) => (
                     <TableCell key={r.id} className="text-right font-bold">
-                      <span className={r.remaining < 0 ? "text-destructive" : "text-green-500"}>
+                      <span className={r.remaining < 0 ? "text-destructive" : "text-success"}>
                         {formatNumber(r.remaining)} Ar
                       </span>
                     </TableCell>
                   ))}
                   <TableCell className="text-right font-bold">
-                    <span className={remainingTotal < 0 ? "text-destructive" : "text-green-500"}>
+                    <span className={remainingTotal < 0 ? "text-destructive" : "text-success"}>
                       {formatNumber(remainingTotal)} Ar
                     </span>
                   </TableCell>

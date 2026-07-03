@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartAreaInteractive } from "@/components/chart"
-import { Wallet, TrendingUp, TrendingDown, PiggyBank } from "lucide-react"
+import { Wallet, TrendingUp, TrendingDown, PiggyBank, Loader2 } from "lucide-react"
 
 interface StatsType {
   projectCount: number
@@ -62,7 +62,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <Loader2 className="animate-spin h-8 w-8 text-primary" />
       </div>
     )
   }

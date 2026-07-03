@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
-import { Plus, Pencil, Trash2, Wallet } from "lucide-react"
+import { Plus, Pencil, Trash2, Wallet, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ProjectForm } from "@/components/projet-forms"
@@ -72,7 +72,7 @@ export function DataProject() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <Loader2 className="animate-spin h-8 w-8 text-primary" />
       </div>
     )
   }
@@ -107,7 +107,9 @@ export function DataProject() {
           {projects.map((project) => (
             <Card
               key={project.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
+              className="cursor-pointer hover:shadow-lg transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/budget/transaction/${project.id}`) }}
               onClick={() => router.push(`/budget/transaction/${project.id}`)}
             >
               <CardHeader className="pb-3">

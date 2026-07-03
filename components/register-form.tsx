@@ -30,7 +30,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
 
   const strengthLabel = ["Faible", "Moyen", "Bon", "Fort", "Très fort"][strength]
   const strengthColor = [
-    "bg-red-500",
+    "bg-destructive",
     "bg-orange-500",
     "bg-yellow-500",
     "bg-lime-500",
@@ -87,13 +87,15 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
             disabled={loading}
             autoComplete="new-password"
           />
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
+          </Button>
         </div>
         {password && (
           <div className="space-y-1">
@@ -122,8 +124,8 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
         />
       </div>
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? <Loader2 className="animate-spin" /> : null}
-        S'inscrire
+        {loading && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
+        {loading ? "Inscription..." : "S'inscrire"}
       </Button>
     </form>
   )
