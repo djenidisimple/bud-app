@@ -10,12 +10,7 @@ import { ProjectForm } from "@/components/projet-forms"
 import { ProjectDelete } from "@/components/project-delete"
 import { toast } from "sonner"
 
-interface Project {
-  id: number
-  name_project: string
-  description_project?: string
-  [key: string]: unknown
-}
+import type { Project } from "@/types"
 
 export function DataProject() {
   const [projects, setProjects] = useState<Project[]>([])

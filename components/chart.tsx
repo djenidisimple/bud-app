@@ -1,79 +1,39 @@
 'use client'
 
-import { useState, useEffect } from "react"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MONTHS_FR } from "@/lib/utils"
+import { formatNumber } from "@/lib/utils"
 
-interface ChartDataItem {
-  created_at: string
-  price_resource: number
-  makes?: Array<{ price_spend: number }>
-  [key: string]: unknown
+interface ChartItem {
+  name: string
+  resource: number
+  spend: number
 }
 
 interface ChartAreaInteractiveProps {
-  data?: ChartDataItem[]
+  data?: ChartItem[]
 }
 
 export function ChartAreaInteractive({ data = [] }: ChartAreaInteractiveProps) {
-  const [month, setMonth] = useState("Tous")
-  const [year, setYear] = useState("Tous")
-
-  const years = [...new Set(data.map(d => new Date(d.created_at).getFullYear().toString()))]
-
-  const filteredData = data.filter(d => {
-    const date = new Date(d.created_at)
-    const m = date.getMonth()
-    const y = date.getFullYear().toString()
-    if (month !== "Tous" && MONTHS_FR[m] !== month) return false
-    if (year !== "Tous" && y !== year) return false
-    return true
-  })
-
-  const chartData = filteredData.map(d => ({
-    month: MONTHS_FR[new Date(d.created_at).getMonth()].slice(0, 3),
-    resource: Number(d.price_resource) || 0,
-    spend: d.makes?.reduce((sum, m) => sum + (Number(m.price_spend) || 0), 0) || 0,
-  }))
+  const chartData = data.map(d => ({
+    name: d.name,
+    resource: Number(d.resource) || 0,
+    spend: Number(d.spend) || 0,
+  })).sort((a, b) => b.resource - a.resource)
 
   return (
     <Card>
-      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <CardTitle>Aperçu Budget</CardTitle>
-          <CardDescription>Évolution des ressources et dépenses</CardDescription>
-        </div>
-        <div className="flex gap-2">
-          <Select value={month} onValueChange={setMonth}>
-            <SelectTrigger className="w-[130px]">
-              <SelectValue placeholder="Mois" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Tous">Tous les mois</SelectItem>
-              {MONTHS_FR.map(m => (
-                <SelectItem key={m} value={m}>{m}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={year} onValueChange={setYear}>
-            <SelectTrigger className="w-[100px]">
-              <SelectValue placeholder="Année" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Tous">Toutes</SelectItem>
-              {years.map(y => (
-                <SelectItem key={y} value={y}>{y}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <CardHeader>
+        <CardTitle>Aperçu Budget</CardTitle>
+        <CardDescription>Répartition des ressources et dépenses par source de financement</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData.length > 0 ? chartData : [{ month: "Aucune donnée", resource: 0, spend: 0 }]}>
+            <AreaChart
+              data={chartData.length > 0 ? chartData : [{ name: "Aucune donnée", resource: 0, spend: 0 }]}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
               <defs>
                 <linearGradient id="resourceGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3} />
@@ -85,9 +45,18 @@ export function ChartAreaInteractive({ data = [] }: ChartAreaInteractiveProps) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="month" className="text-xs text-muted-foreground" />
-              <YAxis className="text-xs text-muted-foreground" />
+              <XAxis
+                dataKey="name"
+                className="text-xs text-muted-foreground"
+                tick={{ fontSize: 11 }}
+                interval={0}
+                angle={-20}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis className="text-xs text-muted-foreground" tickFormatter={(v) => formatNumber(v)} />
               <Tooltip
+                formatter={(value: number) => formatNumber(value)}
                 contentStyle={{
                   background: "hsl(var(--popover))",
                   border: "1px solid hsl(var(--border))",
@@ -99,7 +68,7 @@ export function ChartAreaInteractive({ data = [] }: ChartAreaInteractiveProps) {
                 dataKey="resource"
                 stroke="hsl(var(--chart-1))"
                 fill="url(#resourceGrad)"
-                name="Ressources"
+                name="Budget"
               />
               <Area
                 type="monotone"

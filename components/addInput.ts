@@ -1,38 +1,7 @@
-import { Dispatch, SetStateAction } from "react"
+import type { Dispatch, SetStateAction } from "react"
+import type { Resource, Spend, Detail, Make } from "@/types"
 
-interface ResourceInput {
-  id: number
-  _new?: boolean
-  origine_resource: string
-  price_resource: number
-  [key: string]: unknown
-}
-
-interface SpendInput {
-  id: number
-  _new?: boolean
-  name_spend: string
-  [key: string]: unknown
-}
-
-interface DetailInput {
-  id: number
-  _new?: boolean
-  spend_id: number
-  name_detail: string
-  [key: string]: unknown
-}
-
-interface MakeInput {
-  id: number
-  _new?: boolean
-  detail_id: number
-  resource_id: number
-  price_spend: number
-  [key: string]: unknown
-}
-
-export function addResource(resources: ResourceInput[], setResources: Dispatch<SetStateAction<ResourceInput[]>>) {
+export function addResource(resources: Resource[], setResources: Dispatch<SetStateAction<Resource[]>>) {
   const newId = -Date.now()
   setResources([...resources, {
     id: newId,
@@ -42,7 +11,7 @@ export function addResource(resources: ResourceInput[], setResources: Dispatch<S
   }])
 }
 
-export function addSpend(spends: SpendInput[], setSpends: Dispatch<SetStateAction<SpendInput[]>>) {
+export function addSpend(spends: Spend[], setSpends: Dispatch<SetStateAction<Spend[]>>) {
   const newId = -Date.now()
   setSpends([...spends, {
     id: newId,
@@ -51,7 +20,7 @@ export function addSpend(spends: SpendInput[], setSpends: Dispatch<SetStateActio
   }])
 }
 
-export function addDetail(spendId: number, details: DetailInput[], setDetails: Dispatch<SetStateAction<DetailInput[]>>) {
+export function addDetail(spendId: number, details: Detail[], setDetails: Dispatch<SetStateAction<Detail[]>>) {
   const newId = -Date.now()
   setDetails([...details, {
     id: newId,
@@ -61,7 +30,7 @@ export function addDetail(spendId: number, details: DetailInput[], setDetails: D
   }])
 }
 
-export function addMake(detailId: number, resourceId: number, makes: MakeInput[], setMakes: Dispatch<SetStateAction<MakeInput[]>>) {
+export function addMake(detailId: number, resourceId: number, makes: Make[], setMakes: Dispatch<SetStateAction<Make[]>>) {
   const newId = -Date.now()
   setMakes([...makes, {
     id: newId,

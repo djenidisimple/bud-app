@@ -6,7 +6,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
-const prisma = new PrismaClient({ adapter })
+export const prisma = new PrismaClient({ adapter })
 
 function toPgSql(sql: string) {
   let i = 0
@@ -32,23 +32,24 @@ interface Db {
   transaction(fn: (...args: unknown[]) => Promise<void>): (...args: unknown[]) => Promise<void>
 }
 
+const SQL_INSERT_RE = /^\s*INSERT\s/i
+
 export async function getDb(): Promise<Db> {
   return {
     prepare(sql: string): Statement {
       const pgSql = toPgSql(sql)
-      const isInsert = sql.trim().toUpperCase().startsWith('INSERT')
+      const isInsert = SQL_INSERT_RE.test(sql)
       return {
         async get<T = Record<string, unknown>>(...params: unknown[]): Promise<T | undefined> {
-          const rows: unknown[] = await prisma.$queryRawUnsafe(pgSql, ...params)
-          return (rows as T[])[0] ?? undefined
+          const rows = await prisma.$queryRawUnsafe(pgSql, ...params) as T[]
+          return rows[0] ?? undefined
         },
         async all<T = Record<string, unknown>[]>(...params: unknown[]): Promise<T> {
-          const rows: unknown = await prisma.$queryRawUnsafe(pgSql, ...params)
-          return rows as T
+          return await prisma.$queryRawUnsafe(pgSql, ...params) as T
         },
         async run(...params: unknown[]): Promise<DbResult> {
           if (isInsert) {
-            const rows: { id: number }[] = await prisma.$queryRawUnsafe(pgSql + ' RETURNING id', ...params) as { id: number }[]
+            const rows = await prisma.$queryRawUnsafe(pgSql + ' RETURNING id', ...params) as { id: number }[]
             return { lastInsertRowid: Number(rows[0]?.id) || 0, changes: 1 }
           }
           const count = await prisma.$executeRawUnsafe(pgSql, ...params)

@@ -1,14 +1,6 @@
 'use client'
 
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer"
-
-Font.register({
-  family: "Helvetica",
-  fonts: [
-    { src: "https://fonts.gstatic.com/s/helveticaneue/v70/1Pttg8zYS_SKggPN4iYQTYx0.woff2", fontWeight: "normal" },
-    { src: "https://fonts.gstatic.com/s/helveticaneue/v70/1Pttg8zYS_SKggPN4iYQTYx0.woff2", fontWeight: "bold" },
-  ],
-})
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer"
 
 const styles = StyleSheet.create({
   page: {
@@ -90,39 +82,7 @@ const styles = StyleSheet.create({
   },
 })
 
-interface Project {
-  id: number
-  name_project?: string
-  [key: string]: unknown
-}
-
-interface Resource {
-  id: number
-  price_resource: number
-  origine_resource: string
-  [key: string]: unknown
-}
-
-interface Spend {
-  id: number
-  name_spend: string
-  [key: string]: unknown
-}
-
-interface Detail {
-  id: number
-  spend_id: number
-  name_detail: string
-  [key: string]: unknown
-}
-
-interface Make {
-  id: number
-  detail_id: number
-  resource_id: number
-  price_spend: number
-  [key: string]: unknown
-}
+import type { Project, Resource, Spend, Detail, Make } from "@/types"
 
 interface PDFPreviewProps {
   project: Project

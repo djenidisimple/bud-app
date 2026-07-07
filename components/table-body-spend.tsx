@@ -1,34 +1,11 @@
 'use client'
 
+import { Fragment } from "react"
 import { Button } from "@/components/ui/button"
 import { TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { Plus, Trash2 } from "lucide-react"
 
-interface Resource {
-  id: number
-  [key: string]: unknown
-}
-
-interface Spend {
-  id: number
-  name_spend: string
-  [key: string]: unknown
-}
-
-interface Detail {
-  id: number
-  spend_id: number
-  name_detail: string
-  [key: string]: unknown
-}
-
-interface Make {
-  id: number
-  detail_id: number
-  resource_id: number
-  price_spend: number
-  [key: string]: unknown
-}
+import type { Resource, Spend, Detail, Make } from "@/types"
 
 interface TableBodySpendProps {
   spends: Spend[]
@@ -40,9 +17,11 @@ interface TableBodySpendProps {
   onAddDetail: (spendId: number) => void
   onDeleteDetail: (id: number) => void
   onMakeChange: (detailId: number, resourceId: number, value: number) => void
+  onUpdateSpend: (id: number, field: string, value: string) => void
+  onUpdateDetail: (id: number, field: string, value: string) => void
 }
 
-export function TableBodySpend({ spends, details, makes, resources, onAddSpend, onDeleteSpend, onAddDetail, onDeleteDetail, onMakeChange }: TableBodySpendProps) {
+export function TableBodySpend({ spends, details, makes, resources, onAddSpend, onDeleteSpend, onAddDetail, onDeleteDetail, onMakeChange, onUpdateSpend, onUpdateDetail }: TableBodySpendProps) {
   const getResourceMake = (detailId: number, resourceId: number) => {
     return makes.find(m => m.detail_id === detailId && m.resource_id === resourceId)
   }
@@ -56,17 +35,15 @@ export function TableBodySpend({ spends, details, makes, resources, onAddSpend, 
   return (
     <TableBody>
       {spends.map((spend) => (
-        <>
-          <TableRow key={`spend-${spend.id}`} className="bg-muted/30">
+        <Fragment key={`spend-group-${spend.id}`}>
+          <TableRow className="bg-muted/30">
             <TableCell className="font-medium">
               <div className="flex items-center gap-2">
                 <input
                   className="flex-1 bg-transparent border-b border-dashed border-muted-foreground/30 px-1 py-0.5 text-sm font-medium focus:outline-none focus:border-primary"
                   value={spend.name_spend}
                   placeholder="Catégorie de dépense"
-                  onChange={(e) => {
-                    spend.name_spend = e.target.value
-                  }}
+                  onChange={(e) => onUpdateSpend(spend.id, 'name_spend', e.target.value)}
                 />
                 <Button
                   variant="ghost"
@@ -95,9 +72,7 @@ export function TableBodySpend({ spends, details, makes, resources, onAddSpend, 
                       className="flex-1 bg-transparent border-b border-dashed border-muted-foreground/20 px-1 py-0.5 text-sm focus:outline-none focus:border-primary"
                       value={detail.name_detail}
                       placeholder="Motif de dépense"
-                      onChange={(e) => {
-                        detail.name_detail = e.target.value
-                      }}
+                      onChange={(e) => onUpdateDetail(detail.id, 'name_detail', e.target.value)}
                     />
                     <Button
                       variant="ghost"
@@ -143,7 +118,7 @@ export function TableBodySpend({ spends, details, makes, resources, onAddSpend, 
             {resources.map((r) => <TableCell key={r.id} />)}
             <TableCell />
           </TableRow>
-        </>
+        </Fragment>
       ))}
       <TableRow>
         <TableCell>

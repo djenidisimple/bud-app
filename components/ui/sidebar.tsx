@@ -20,6 +20,8 @@ const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 interface SidebarContextValue {
   open: boolean
   setOpen: (value: boolean) => void
+  collapsible: string
+  setCollapsible: (value: string) => void
 }
 
 const SidebarContext = React.createContext<SidebarContextValue | null>(null)
@@ -52,6 +54,7 @@ const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderProps>(
     ref
   ) => {
     const [open, setOpen] = React.useState(defaultOpen)
+    const [collapsible, setCollapsible] = React.useState("icon")
 
     React.useEffect(() => {
       const saved = document.cookie
@@ -83,13 +86,14 @@ const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderProps>(
     }, [])
 
     return (
-      <SidebarContext.Provider value={{ open, setOpen: setOpenWithCookie }}>
+      <SidebarContext.Provider value={{ open, setOpen: setOpenWithCookie, collapsible, setCollapsible }}>
         <div
           style={{
             "--sidebar-width": SIDEBAR_WIDTH,
             "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
             ...style,
           } as React.CSSProperties}
+          data-collapsible={collapsible}
           className={cn("group/sidebar-wrapper flex min-h-svh w-full", className)}
           ref={ref}
           {...props}
@@ -120,7 +124,11 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
     },
     ref
   ) => {
-    const { open, setOpen } = useSidebar()
+    const { open, setOpen, setCollapsible } = useSidebar()
+
+    React.useEffect(() => {
+      setCollapsible(collapsible)
+    }, [collapsible, setCollapsible])
 
     return (
       <>
@@ -177,7 +185,7 @@ SidebarContent.displayName = "SidebarContent"
 const SidebarHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col gap-2 p-2", className)}
+    className={cn("flex flex-col gap-2 p-2 group-data-[collapsible=icon]:p-1", className)}
     {...props}
   />
 ))
@@ -186,7 +194,7 @@ SidebarHeader.displayName = "SidebarHeader"
 const SidebarFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col gap-2 p-2", className)}
+    className={cn("flex flex-col gap-2 p-2 group-data-[collapsible=icon]:p-1", className)}
     {...props}
   />
 ))
@@ -385,7 +393,7 @@ const SidebarGroup = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
   <div
     ref={ref}
     data-sidebar="group"
-    className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+    className={cn("relative flex w-full min-w-0 flex-col p-2 group-data-[collapsible=icon]:p-1", className)}
     {...props}
   />
 ))

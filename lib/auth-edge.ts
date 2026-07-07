@@ -1,8 +1,10 @@
 import { SignJWT, jwtVerify } from 'jose'
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'bud-app-secret-key-change-in-production-123456789'
-)
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required')
+}
+
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET)
 
 export const COOKIE_NAME = 'access_token'
 
