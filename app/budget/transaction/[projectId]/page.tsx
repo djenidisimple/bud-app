@@ -9,57 +9,13 @@ import { Table, TableFooter, TableRow, TableCell } from "@/components/ui/table"
 import { TableHeaderComponent } from "@/components/table-header"
 import { TableBodySpend } from "@/components/table-body-spend"
 import { PDFExportButton } from "@/components/showPdf"
+import { ExcelExportButton } from "@/components/ExcelExport"
 import { addResource, addSpend, addDetail } from "@/components/addInput"
 import { calculateRemainingResources, formatNumber } from "@/lib/utils"
 import { Save, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
-interface ProjectType {
-  id: number
-  name_project: string
-  description_project: string
-  [key: string]: unknown
-}
-
-interface ResourceType {
-  id: number
-  project_id?: number
-  origine_resource: string
-  price_resource: number
-  _new?: boolean
-  _delete?: boolean
-  remaining?: number
-  used?: number
-  [key: string]: unknown
-}
-
-interface SpendType {
-  id: number
-  project_id?: number
-  name_spend: string
-  _new?: boolean
-  _delete?: boolean
-  [key: string]: unknown
-}
-
-interface DetailType {
-  id: number
-  spend_id: number
-  name_detail: string
-  _new?: boolean
-  _delete?: boolean
-  [key: string]: unknown
-}
-
-interface MakeType {
-  id: number
-  detail_id: number
-  resource_id: number
-  price_spend: number
-  _new?: boolean
-  _delete?: boolean
-  [key: string]: unknown
-}
+import type { Project as ProjectType, Resource as ResourceType, Spend as SpendType, Detail as DetailType, Make as MakeType } from "@/types"
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams()
@@ -91,7 +47,19 @@ export default function ProjectDetailPage() {
     fetchData()
   }, [fetchData])
 
+  const validateFields = () => {
+    const emptyResources = resources.filter(r => !r._delete && !r.origine_resource?.trim())
+    const emptySpends = spends.filter(s => !s._delete && !s.name_spend?.trim())
+    const emptyDetails = details.filter(d => !d._delete && !d.name_detail?.trim())
+    const warnings: string[] = []
+    if (emptyResources.length) warnings.push(`${emptyResources.length} ressource(s) sans nom`)
+    if (emptySpends.length) warnings.push(`${emptySpends.length} catégorie(s) sans nom`)
+    if (emptyDetails.length) warnings.push(`${emptyDetails.length} motif(s) sans nom`)
+    if (warnings.length) toast.warning(warnings.join(" • "))
+  }
+
   const handleSave = async () => {
+    validateFields()
     setSaving(true)
     try {
       await axios.post(`/api/projects/${projectId}/data`, {
@@ -107,6 +75,18 @@ export default function ProjectDetailPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleUpdateResource = (id: number, field: string, value: string) => {
+    setResources(resources.map(r => r.id === id ? { ...r, [field]: value } : r))
+  }
+
+  const handleUpdateSpend = (id: number, field: string, value: string) => {
+    setSpends(spends.map(s => s.id === id ? { ...s, [field]: value } : s))
+  }
+
+  const handleUpdateDetail = (id: number, field: string, value: string) => {
+    setDetails(details.map(d => d.id === id ? { ...d, [field]: value } : d))
   }
 
   const handleAddResource = () => addResource(resources, setResources)
@@ -178,6 +158,13 @@ export default function ProjectDetailPage() {
             details={details.filter(d => !d._delete)}
             makes={makes.filter(m => !m._delete)}
           />
+          <ExcelExportButton
+            project={project}
+            resources={resources.filter(r => !r._delete)}
+            spends={spends.filter(s => !s._delete)}
+            details={details.filter(d => !d._delete)}
+            makes={makes.filter(m => !m._delete)}
+          />
           <Button onClick={handleSave} disabled={saving}>
             {saving ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Save className="mr-2 h-4 w-4" />}
             Enregistrer
@@ -196,6 +183,7 @@ export default function ProjectDetailPage() {
                 resources={resources.filter(r => !r._delete)}
                 onAddResource={handleAddResource}
                 onDeleteResource={handleDeleteResource}
+                onUpdateResource={handleUpdateResource}
               />
               <TableBodySpend
                 spends={spends.filter(s => !s._delete)}
@@ -207,6 +195,8 @@ export default function ProjectDetailPage() {
                 onAddDetail={handleAddDetail}
                 onDeleteDetail={handleDeleteDetail}
                 onMakeChange={handleMakeChange}
+                onUpdateSpend={handleUpdateSpend}
+                onUpdateDetail={handleUpdateDetail}
               />
               <TableFooter>
                 <TableRow>

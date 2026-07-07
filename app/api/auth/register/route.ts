@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const hashedPassword = hashPassword(password)
+    const hashedPassword = await hashPassword(password)
     const result = await db.prepare('INSERT INTO "User" (name, password) VALUES (?, ?)').run(name, hashedPassword)
 
     const token = await createToken({ id: result.lastInsertRowid, name })

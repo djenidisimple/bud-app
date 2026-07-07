@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const db = await getDb()
     const user = await db.prepare('SELECT * FROM "User" WHERE name = ?').get(name) as { id: number; name: string; password: string } | undefined
 
-    if (!user || !comparePassword(password, user.password)) {
+    if (!user || !(await comparePassword(password, user.password))) {
       return NextResponse.json(
         { error: 'Nom d\'utilisateur ou mot de passe incorrect' },
         { status: 401 }

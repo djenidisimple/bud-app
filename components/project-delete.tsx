@@ -11,11 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
-interface Project {
-  id: number
-  name_project: string
-  [key: string]: unknown
-}
+import type { Project } from "@/types"
 
 interface ProjectDeleteProps {
   project: Project

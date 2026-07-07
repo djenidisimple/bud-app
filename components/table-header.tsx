@@ -4,19 +4,16 @@ import { Button } from "@/components/ui/button"
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Trash2 } from "lucide-react"
 
-interface Resource {
-  id: number
-  origine_resource: string
-  [key: string]: unknown
-}
+import type { Resource } from "@/types"
 
 interface TableHeaderComponentProps {
   resources: Resource[]
   onAddResource: () => void
   onDeleteResource: (id: number) => void
+  onUpdateResource: (id: number, field: string, value: string) => void
 }
 
-export function TableHeaderComponent({ resources, onAddResource, onDeleteResource }: TableHeaderComponentProps) {
+export function TableHeaderComponent({ resources, onAddResource, onDeleteResource, onUpdateResource }: TableHeaderComponentProps) {
   return (
     <TableHeader>
       <TableRow>
@@ -28,9 +25,7 @@ export function TableHeaderComponent({ resources, onAddResource, onDeleteResourc
                 className="w-full bg-transparent border-b border-dashed border-muted-foreground/30 px-1 py-0.5 text-sm focus:outline-none focus:border-primary"
                 value={r.origine_resource}
                 placeholder="Nom ressource"
-                onChange={(e) => {
-                  r.origine_resource = e.target.value
-                }}
+                onChange={(e) => onUpdateResource(r.id, 'origine_resource', e.target.value)}
               />
               <Button
                 variant="ghost"

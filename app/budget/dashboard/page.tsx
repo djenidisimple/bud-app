@@ -6,12 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartAreaInteractive } from "@/components/chart"
 import { Wallet, TrendingUp, TrendingDown, PiggyBank, Loader2 } from "lucide-react"
 
+interface ChartItem {
+  name: string
+  resource: number
+  spend: number
+}
+
 interface StatsType {
   projectCount: number
   totalResource: number
   totalSpend: number
   remaining: number
-  chartData: any[]
+  chartData: ChartItem[]
 }
 
 export default function DashboardPage() {
@@ -21,34 +27,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const projectsRes = await axios.get("/api/projects")
-        const projects = projectsRes.data.projects || []
-
-        let totalResource = 0
-        let totalSpend = 0
-        let allResources: any[] = []
-
-        for (const project of projects) {
-          const dataRes = await axios.get(`/api/projects/${project.id}/data`)
-          const data = dataRes.data
-          totalResource += data.budget?.totalResource || 0
-          totalSpend += data.budget?.totalSpend || 0
-          allResources = [...allResources, ...(data.resources || [])]
-        }
-
-        // Group resources by origina_resource for chart data
-        const chartData = allResources.map(r => ({
-          ...r,
-          makes: [],
-        }))
-
-        setStats({
-          projectCount: projects.length,
-          totalResource,
-          totalSpend,
-          remaining: totalResource - totalSpend,
-          chartData,
-        })
+        const res = await axios.get("/api/projects/stats")
+        setStats(res.data)
       } catch (err) {
         console.error("Error fetching dashboard stats:", err)
       } finally {
@@ -75,17 +55,17 @@ export default function DashboardPage() {
     },
     {
       title: "Budget total",
-      value: `${(stats?.totalResource || 0).toLocaleString()} Ar`,
+      value: `${(stats?.totalResource || 0).toLocaleString("fr-FR")} Ar`,
       icon: TrendingUp,
     },
     {
       title: "Dépenses totales",
-      value: `${(stats?.totalSpend || 0).toLocaleString()} Ar`,
+      value: `${(stats?.totalSpend || 0).toLocaleString("fr-FR")} Ar`,
       icon: TrendingDown,
     },
     {
       title: "Reste à dépenser",
-      value: `${(stats?.remaining || 0).toLocaleString()} Ar`,
+      value: `${(stats?.remaining || 0).toLocaleString("fr-FR")} Ar`,
       icon: PiggyBank,
     },
   ]

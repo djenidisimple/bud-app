@@ -12,7 +12,7 @@
 - **Devise** : Ar (Ariary, Madagascar)
 - **Licence** : MIT
 - **Auteur** : djenidisimple
-- **Dernier commit** : 2026-01-30
+- **Dernier commit** : 2026-07-04
 
 ---
 
@@ -32,12 +32,11 @@
 | Requêtes HTTP client | Axios | ^1.10.0 |
 | Notifications | Sonner | ^2.0.1 |
 | Icônes | Lucide React | ^0.525.0 |
-| Animations | Framer Motion | ^12.9.0 |
 | Dark mode | next-themes | ^0.4.6 |
 | Utilitaires CSS | clsx + tailwind-merge + class-variance-authority | — |
-| UUID | uuid | ^11.1.0 |
 | Linting | ESLint (next/core-web-vitals) | ^9.25.0 |
 | PostCSS | Autoprefixer | ^10.4.21 |
+| Langage | TypeScript | ^5.0.0 |
 
 ---
 
@@ -47,72 +46,68 @@
 bud-app/
 ├── app/                          # Next.js App Router
 │   ├── globals.css               # Styles globaux + variables CSS thème
-│   ├── layout.js                 # Layout racine (Providers wrapper)
-│   ├── page.js                   # Page d'accueil (redirige vers /login)
-│   ├── providers.js              # ThemeProvider + AuthProvider + Toaster
+│   ├── layout.tsx                # Layout racine (Providers wrapper)
+│   ├── page.tsx                  # Page d'accueil (redirige vers /login)
+│   ├── providers.tsx             # ThemeProvider + AuthProvider + Toaster
 │   ├── api/
 │   │   └── auth/                 # Endpoints d'authentification
-│   │   │   ├── login/route.js    # POST : connexion
-│   │   │   ├── logout/route.js   # POST : déconnexion
-│   │   │   ├── register/route.js # POST : inscription
-│   │   │   └── session/route.js  # GET : vérifier session
+│   │   │   ├── login/route.ts    # POST : connexion
+│   │   │   ├── logout/route.ts   # POST : déconnexion
+│   │   │   ├── register/route.ts # POST : inscription
+│   │   │   └── session/route.ts  # GET : vérifier session
 │   │   └── projects/             # Endpoints CRUD projets
-│   │       ├── route.js          # GET (liste), POST (créer)
+│   │       ├── route.ts          # GET (liste), POST (créer)
 │   │       └── [id]/
-│   │           ├── route.js      # GET, PUT, DELETE
-│   │           ├── data/route.js # GET (données complètes), POST (sauvegarde)
-│   │           ├── filter/route.js # POST : filtre par année
-│   │           └── stats/route.js  # GET : stats agrégées + graphique
+│   │           ├── route.ts      # GET, PUT, DELETE
+│   │           ├── data/route.ts # GET (données complètes), POST (sauvegarde)
+│   │           ├── filter/route.ts # POST : filtre par année
+│   │           └── stats/route.ts  # GET : stats agrégées + graphique
 │   └── budget/                   # Pages protégées (authentification requise)
-│       ├── layout.js             # Layout avec sidebar
-│       ├── dashboard/page.js     # Tableau de bord (KPI + graphique)
-│       ├── profile/page.js       # Profil utilisateur
-│       ├── transaction/page.js   # Liste des projets
-│       ├── transaction/[projectId]/page.js  # Tableau budgétaire (page principale)
-│       ├── settings/page.js      # Paramètres (gestion utilisateurs)
-│       └── settings/register/page.js # Création d'utilisateur
+│       ├── layout.tsx            # Layout avec sidebar
+│       ├── dashboard/page.tsx    # Tableau de bord (KPI + graphique)
+│       ├── profile/page.tsx      # Profil utilisateur
+│       ├── transaction/page.tsx  # Liste des projets
+│       ├── transaction/[projectId]/page.tsx  # Tableau budgétaire (page principale)
+│       ├── settings/page.tsx     # Paramètres (gestion utilisateurs)
+│       └── settings/register/page.tsx # Création d'utilisateur
 ├── components/
 │   ├── ui/                       # Composants shadcn/ui (22 composants)
-│   ├── addInput.js               # Fonctions helper pour créer des entités
-│   ├── app-sidebar.jsx           # Navigation latérale
-│   ├── chart.jsx                 # Graphique area Recharts
-│   ├── data-project.jsx          # Liste projets avec CRUD
-│   ├── login-form.jsx            # Formulaire de connexion
-│   ├── nav-main.jsx              # Éléments de navigation sidebar
-│   ├── nav-user.jsx              # Menu utilisateur (dropdown)
-│   ├── PDFPreview.jsx            # Document React-PDF
-│   ├── project-delete.jsx        # Dialog de confirmation suppression
-│   ├── projet-forms.jsx          # Dialog création/édition projet
-│   ├── register-form.jsx         # Formulaire d'inscription
-│   ├── showPdf.jsx               # Aperçu PDF + téléchargement
-│   ├── table-body-make.jsx       # Édition ligne "make" (variante 1)
-│   ├── table-body-make2.jsx      # Édition ligne "make" (variante 2)
-│   ├── table-body-spend.jsx      # Corps du tableau budgétaire principal
-│   └── table-header.jsx          # En-tête du tableau (colonnes ressources)
+│   ├── addInput.ts               # Fonctions helper pour créer des entités
+│   ├── app-sidebar.tsx           # Navigation latérale
+│   ├── chart.tsx                 # Graphique area Recharts
+│   ├── data-project.tsx          # Liste projets avec CRUD
+│   ├── login-form.tsx            # Formulaire de connexion
+│   ├── nav-main.tsx              # Éléments de navigation sidebar
+│   ├── nav-user.tsx              # Menu utilisateur (dropdown)
+│   ├── PDFPreview.tsx            # Document React-PDF
+│   ├── project-delete.tsx        # Dialog de confirmation suppression
+│   ├── projet-forms.tsx          # Dialog création/édition projet
+│   ├── register-form.tsx         # Formulaire d'inscription
+│   ├── showPdf.tsx               # Aperçu PDF + téléchargement
+│   ├── table-body-spend.tsx      # Corps du tableau budgétaire principal
+│   └── table-header.tsx          # En-tête du tableau (colonnes ressources)
 ├── context/
-│   └── AuthContext.js            # Contexte React d'authentification (useAuth)
+│   └── AuthContext.tsx            # Contexte React d'authentification (useAuth)
 ├── generated/prisma/             # Client Prisma généré
-├── hooks/                        # (vide - pas de hooks customs)
 ├── lib/
-│   ├── auth-edge.js              # JWT création/vérification (jose, compatible Edge)
-│   ├── auth.js                   # Auth serveur : hash, cookies, session
-│   ├── db.js                     # Adaptateur Prisma avec interface SQL "prepare/exec"
-│   └── utils.js                  # Utilitaires : cn, formatNumber, calculateBudget, etc.
+│   ├── auth-edge.ts              # JWT création/vérification (jose, compatible Edge)
+│   ├── auth.ts                   # Auth serveur : hash, cookies, session
+│   ├── db.ts                     # Adaptateur Prisma avec interface SQL "prepare/exec"
+│   └── utils.ts                  # Utilitaires : cn, formatNumber, calculateBudget, etc.
 ├── prisma/
 │   ├── schema.prisma             # Schéma de base de données (6 modèles)
 │   ├── config.ts                 # Configuration Prisma
 │   └── migrations/               # Migrations PostgreSQL
-├── middleware.js                 # Middleware Next.js (protection routes)
+├── middleware.ts                 # Middleware Next.js (protection routes)
 ├── next.config.js                # Configuration Next.js
 ├── tailwind.config.js            # Configuration Tailwind (thème shadcn)
 ├── postcss.config.js             # PostCSS config
-├── jsconfig.json                 # Alias @/ pour les imports
+├── tsconfig.json                 # Configuration TypeScript + alias @/
 ├── package.json
-├── .env                          # DATABASE_URL + JWT_SECRET
+├── .env.example                  # Variables d'environnement requises
 ├── .gitignore
 ├── Licence                       # Licence MIT
 ├── README.md
-├── -- SQLite.sql                 # Anciennes requêtes SQLite (référence)
 ├── .excalidraw                   # Diagramme du modèle de données
 ├── cahier de charge.docx/pdf     # Spécifications fonctionnelles
 └── cahier de recette.docx        # Tests de recette
@@ -220,7 +215,7 @@ Client                    Middleware                    Serveur                 
 | `/api/auth/logout` | POST | — | `{ success: true }` |
 | `/api/auth/session` | GET | — | `{ user: { id, name } }` ou `null` |
 
-### Contexte Client (`AuthContext.js`)
+### Contexte Client (`AuthContext.tsx`)
 
 ```jsx
 const { user, loading, login, register, logout, checkSession } = useAuth()
@@ -302,7 +297,7 @@ Cette approche évite les appels API multiples. L'interface utilisateur reste re
 
 ## 7. Composants Clés
 
-### addInput.js — Helpers de création d'entités
+### addInput.ts — Helpers de création d'entités
 
 | Fonction | Crée | Propriétés |
 |----------|------|------------|
@@ -312,7 +307,7 @@ Cette approche évite les appels API multiples. L'interface utilisateur reste re
 
 Les IDs négatifs temporaires évitent les conflits avec les IDs réels de la base de données.
 
-### utils.js — Fonctions utilitaires
+### utils.ts — Fonctions utilitaires
 
 - **`cn(...inputs)`** : fusion de classes Tailwind (clsx + tailwind-merge)
 - **`formatNumber(num)`** : formatage nombre en français (ex: `1 234 567`)
@@ -355,11 +350,11 @@ Utilise `@react-pdf/renderer` pour générer un document A4 avec :
 
 ---
 
-## 9. Adaptateur Base de Données (`lib/db.js`)
+## 9. Adaptateur Base de Données (`lib/db.ts`)
 
 Une couche d'abstraction personnalisée au-dessus de Prisma :
 
-```javascript
+```typescript
 const db = await getDb()
 // Requête avec paramètres (conversion automatique ? → $1, $2, ...)
 db.prepare('SELECT * FROM resources WHERE project_id = ?').all(id)
@@ -387,7 +382,9 @@ JWT_SECRET=bud-app-secret-key-change-in-production-123456789
 
 ### `next.config.js`
 ```javascript
-module.exports = { reactStrictMode: true }
+/** @type {import('next').NextConfig} */
+const nextConfig = { reactStrictMode: true }
+module.exports = nextConfig
 ```
 
 ### `tailwind.config.js`
@@ -396,7 +393,7 @@ module.exports = { reactStrictMode: true }
 - chart colors (5 nuances)
 - Dark mode: class-based
 
-### `jsconfig.json`
+### `tsconfig.json`
 ```json
 { "compilerOptions": { "paths": { "@/*": ["./*"] } } }
 ```

@@ -4,12 +4,12 @@ import { createToken, verifyToken, COOKIE_NAME } from './auth-edge'
 
 export { createToken, verifyToken, COOKIE_NAME }
 
-export function hashPassword(password: string) {
-  return bcrypt.hashSync(password, 10)
+export async function hashPassword(password: string) {
+  return bcrypt.hash(password, 10)
 }
 
-export function comparePassword(password: string, hash: string) {
-  return bcrypt.compareSync(password, hash)
+export async function comparePassword(password: string, hash: string) {
+  return bcrypt.compare(password, hash)
 }
 
 export async function getSession() {

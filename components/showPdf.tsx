@@ -7,39 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { PDFPreview } from "@/components/PDFPreview"
 import { FileDown, FileText } from "lucide-react"
 
-interface Project {
-  id: number
-  name_project?: string
-  [key: string]: unknown
-}
-
-interface Resource {
-  id: number
-  price_resource: number
-  origine_resource: string
-  [key: string]: unknown
-}
-
-interface Spend {
-  id: number
-  name_spend: string
-  [key: string]: unknown
-}
-
-interface Detail {
-  id: number
-  spend_id: number
-  name_detail: string
-  [key: string]: unknown
-}
-
-interface Make {
-  id: number
-  detail_id: number
-  resource_id: number
-  price_spend: number
-  [key: string]: unknown
-}
+import type { Project, Resource, Spend, Detail, Make } from "@/types"
 
 interface PDFExportButtonProps {
   project: Project
