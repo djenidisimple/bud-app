@@ -45,15 +45,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <GalleryVerticalEnd className="size-4" />
-              </div>
-              <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-                <span className="font-semibold">BudApp</span>
-                <span className="text-xs text-sidebar-foreground/60">Gestion de Budget</span>
-              </div>
-            </SidebarMenuButton>
+              <SidebarMenuButton size="lg">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/30">
+                  <GalleryVerticalEnd className="size-4" />
+                </div>
+                <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
+                  <span className="font-black tracking-tight">BudApp</span>
+                  <span className="text-[10px] font-bold text-sidebar-foreground/50 uppercase tracking-wider">Gestion Finance</span>
+                </div>
+              </SidebarMenuButton>
+
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

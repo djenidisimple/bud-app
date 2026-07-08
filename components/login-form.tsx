@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, User, Lock } from "lucide-react"
 import { toast } from "sonner"
 
 export function LoginForm() {
@@ -33,23 +33,29 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="name">Nom d'utilisateur</Label>
-        <Input
-          id="name"
-          placeholder="Entrez votre nom"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={loading}
-          autoComplete="username"
-        />
+        <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Nom d'utilisateur</Label>
+        <div className="relative group">
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input
+            id="name"
+            className="pl-10 h-12 rounded-xl border-border/60 focus:ring-2 focus:ring-primary/20 transition-all"
+            placeholder="Entrez votre nom"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={loading}
+            autoComplete="username"
+          />
+        </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Mot de passe</Label>
-        <div className="relative">
+        <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Mot de passe</Label>
+        <div className="relative group">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input
             id="password"
+            className="pl-10 pr-10 h-12 rounded-xl border-border/60 focus:ring-2 focus:ring-primary/20 transition-all"
             type={showPassword ? "text" : "password"}
             placeholder="Entrez votre mot de passe"
             value={password}
@@ -68,8 +74,8 @@ export function LoginForm() {
           </Button>
         </div>
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
+      <Button type="submit" className="w-full h-12 rounded-xl font-bold text-base shadow-lg shadow-primary/30 transition-transform hover:scale-[1.02] active:scale-95" disabled={loading}>
+        {loading && <Loader2 className="animate-spin mr-2 h-5 w-5" />}
         {loading ? "Connexion..." : "Se connecter"}
       </Button>
     </form>

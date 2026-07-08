@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { getSession } from '@/lib/auth'
+import { z } from 'zod'
+
+const projectUpdateSchema = z.object({
+  name_project: z.string().min(1, 'Le nom du projet est requis').optional(),
+  description_project: z.string().optional(),
+})
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession()
@@ -9,8 +15,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   const { id } = await params
-  const db = await getDb()
-  const project = await db.prepare('SELECT * FROM "Project" WHERE id = ? AND user_id = ?').get(id, session.id)
+  const project = await prisma.project.findFirst({
+    where: { id: parseInt(id), user_id: session.id },
+  })
 
   if (!project) {
     return NextResponse.json({ error: 'Projet non trouvé' }, { status: 404 })
@@ -27,21 +34,30 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   try {
     const { id } = await params
-    const { name_project, description_project } = await request.json()
-    const db = await getDb()
+    const body = await request.json()
+    const { name_project, description_project } = projectUpdateSchema.parse(body)
 
-    const existing = await db.prepare('SELECT * FROM "Project" WHERE id = ? AND user_id = ?').get(id, session.id)
-    if (!existing) {
+    const project = await prisma.project.findFirst({
+      where: { id: parseInt(id), user_id: session.id },
+    })
+
+    if (!project) {
       return NextResponse.json({ error: 'Projet non trouvé' }, { status: 404 })
     }
 
-    await db.prepare(
-      'UPDATE "Project" SET name_project = ?, description_project = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-    ).run(name_project || existing.name_project, description_project ?? existing.description_project, id)
+    const updatedProject = await prisma.project.update({
+      where: { id: parseInt(id) },
+      data: {
+        name_project: name_project ?? project.name_project,
+        description_project: description_project ?? project.description_project,
+      },
+    })
 
-    const project = await db.prepare('SELECT * FROM "Project" WHERE id = ?').get(id)
-    return NextResponse.json({ project, message: 'Projet mis à jour' })
-  } catch (error) {
+    return NextResponse.json({ project: updatedProject, message: 'Projet mis à jour' })
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Données invalides', details: error.errors }, { status: 400 })
+    }
     return NextResponse.json({ error: 'Erreur lors de la mise à jour' }, { status: 500 })
   }
 }
@@ -53,13 +69,14 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   }
 
   const { id } = await params
-  const db = await getDb()
+  const project = await prisma.project.findFirst({
+    where: { id: parseInt(id), user_id: session.id },
+  })
 
-  const project = await db.prepare('SELECT * FROM "Project" WHERE id = ? AND user_id = ?').get(id, session.id)
   if (!project) {
     return NextResponse.json({ error: 'Projet non trouvé' }, { status: 404 })
   }
 
-  await db.prepare('DELETE FROM "Project" WHERE id = ?').run(id)
+  await prisma.project.delete({ where: { id: parseInt(id) } })
   return NextResponse.json({ message: 'Projet supprimé' })
 }
