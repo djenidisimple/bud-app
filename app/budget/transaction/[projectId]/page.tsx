@@ -12,7 +12,7 @@ import { PDFExportButton } from "@/components/showPdf"
 import { ExcelExportButton } from "@/components/ExcelExport"
 import { addResource, addSpend, addDetail } from "@/components/addInput"
 import { calculateRemainingResources, formatNumber } from "@/lib/utils"
-import { Save, Loader2 } from "lucide-react"
+import { Save, Loader2, LayoutDashboard, FileText } from "lucide-react"
 import { toast } from "sonner"
 
 import type { Project as ProjectType, Resource as ResourceType, Spend as SpendType, Detail as DetailType, Make as MakeType } from "@/types"
@@ -47,37 +47,51 @@ export default function ProjectDetailPage() {
     fetchData()
   }, [fetchData])
 
-  const validateFields = () => {
-    const emptyResources = resources.filter(r => !r._delete && !r.origine_resource?.trim())
-    const emptySpends = spends.filter(s => !s._delete && !s.name_spend?.trim())
-    const emptyDetails = details.filter(d => !d._delete && !d.name_detail?.trim())
-    const warnings: string[] = []
-    if (emptyResources.length) warnings.push(`${emptyResources.length} ressource(s) sans nom`)
-    if (emptySpends.length) warnings.push(`${emptySpends.length} catégorie(s) sans nom`)
-    if (emptyDetails.length) warnings.push(`${emptyDetails.length} motif(s) sans nom`)
-    if (warnings.length) toast.warning(warnings.join(" • "))
-  }
-
   const handleSave = async () => {
-    validateFields()
     setSaving(true)
     try {
-      await axios.post(`/api/projects/${projectId}/data`, {
-        resources,
-        spends,
-        details,
-        makes,
+      const requests: Promise<any>[] = []
+
+      // Resources
+      resources.forEach(r => {
+        if (r._delete && r.id) requests.push(axios.delete(`/api/projects/${projectId}/resources/${r.id}`))
+        else if (r._new) requests.push(axios.post(`/api/projects/${projectId}/resources`, r))
+        else if (r.id) requests.push(axios.patch(`/api/projects/${projectId}/resources/${r.id}`, r))
       })
-      toast.success("Données sauvegardées")
+
+      // Spends
+      spends.forEach(s => {
+        if (s._delete && s.id) requests.push(axios.delete(`/api/projects/${projectId}/spends/${s.id}`))
+        else if (s._new) requests.push(axios.post(`/api/projects/${projectId}/spends`, s))
+        else if (s.id) requests.push(axios.patch(`/api/projects/${projectId}/spends/${s.id}`, s))
+      })
+
+      // Details
+      details.forEach(d => {
+        if (d._delete && d.id) requests.push(axios.delete(`/api/projects/${projectId}/details/${d.id}`))
+        else if (d._new) requests.push(axios.post(`/api/projects/${projectId}/details`, d))
+        else if (d.id) requests.push(axios.patch(`/api/projects/${projectId}/details/${d.id}`, d))
+      })
+
+      // Makes
+      makes.forEach(m => {
+        if (m._delete && m.id) requests.push(axios.delete(`/api/projects/${projectId}/makes/${m.id}`))
+        else if (m._new) requests.push(axios.post(`/api/projects/${projectId}/makes`, m))
+        else if (m.id) requests.push(axios.patch(`/api/projects/${projectId}/makes/${m.id}`, m))
+      })
+
+      await Promise.all(requests)
+      toast.success("✅ Toutes les modifications ont été sauvegardées !")
       fetchData()
-    } catch {
-      toast.error("Erreur lors de la sauvegarde")
+    } catch (err: any) {
+      const message = err.response?.data?.error || "Erreur lors de la sauvegarde d'un ou plusieurs éléments"
+      toast.error(message)
     } finally {
       setSaving(false)
     }
   }
 
-  const handleUpdateResource = (id: number, field: string, value: string) => {
+  const handleUpdateResource = (id: number, field: string, value: any) => {
     setResources(resources.map(r => r.id === id ? { ...r, [field]: value } : r))
   }
 
@@ -128,13 +142,16 @@ export default function ProjectDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
+          <p className="text-muted-foreground animate-pulse font-medium">Chargement du projet...</p>
+        </div>
       </div>
     )
   }
 
   if (!project) {
-    return <div className="text-center text-muted-foreground">Projet non trouvé</div>
+    return <div className="text-center py-20 text-muted-foreground font-medium">Projet non trouvé</div>
   }
 
   const remainingResources = calculateRemainingResources(resources.filter(r => !r._delete), makes.filter(m => !m._delete))
@@ -144,39 +161,64 @@ export default function ProjectDetailPage() {
   const remainingTotal = remainingResources.reduce((sum, r) => sum + (r.remaining || 0), 0)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{project.name_project}</h1>
-          <p className="text-muted-foreground">{project.description_project}</p>
+    <div className="space-y-8 max-w-7xl mx-auto p-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-3xl shadow-sm border border-border/60">
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 text-primary font-bold text-sm uppercase tracking-widest">
+            <LayoutDashboard className="h-4 w-4" />
+            <span>Gestion Budgétaire</span>
+          </div>
+          <h1 className="text-4xl font-black text-foreground tracking-tight">{project.name_project}</h1>
+          <p className="text-muted-foreground text-lg font-medium">{project.description_project}</p>
         </div>
-        <div className="flex gap-2">
-          <PDFExportButton
-            project={project}
-            resources={resources.filter(r => !r._delete)}
-            spends={spends.filter(s => !s._delete)}
-            details={details.filter(d => !d._delete)}
-            makes={makes.filter(m => !m._delete)}
-          />
-          <ExcelExportButton
-            project={project}
-            resources={resources.filter(r => !r._delete)}
-            spends={spends.filter(s => !s._delete)}
-            details={details.filter(d => !d._delete)}
-            makes={makes.filter(m => !m._delete)}
-          />
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Save className="mr-2 h-4 w-4" />}
-            Enregistrer
+        <div className="flex flex-wrap gap-3">
+          <div className="flex items-center gap-2 mr-2">
+            <PDFExportButton
+              project={project}
+              resources={resources.filter(r => !r._delete)}
+              spends={spends.filter(s => !s._delete)}
+              details={details.filter(d => !d._delete)}
+              makes={makes.filter(m => !m._delete)}
+            />
+            <ExcelExportButton
+              project={project}
+              resources={resources.filter(r => !r._delete)}
+              spends={spends.filter(s => !s._delete)}
+              details={details.filter(d => !d._delete)}
+              makes={makes.filter(m => !m._delete)}
+            />
+          </div>
+          <Button 
+            onClick={handleSave} 
+            disabled={saving}
+            className="h-12 px-8 rounded-full bg-primary text-white font-bold hover:bg-primary/90 transition-all hover:scale-105 shadow-lg flex items-center gap-2"
+          >
+            {saving ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
+            {saving ? "Sauvegarde..." : "Enregistrer les modifications"}
           </Button>
         </div>
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle>Tableau Budgétaire</CardTitle>
+      <Card className="overflow-hidden border-none shadow-2xl bg-white/80 backdrop-blur-md rounded-3xl">
+        <CardHeader className="pb-6 bg-muted/30 border-b border-border/60 px-8">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-2xl font-black text-foreground flex items-center gap-3">
+              <FileText className="h-6 w-6 text-primary" />
+              Tableau d'Allocation
+            </CardTitle>
+            <div className="flex items-center gap-4 text-sm font-bold">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-success" />
+                <span className="text-muted-foreground">Ressources</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-destructive" />
+                <span className="text-muted-foreground">Dépenses</span>
+              </div>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="p-0 md:px-6">
+        <CardContent className="p-0">
           <div className="overflow-auto">
             <Table>
               <TableHeaderComponent
@@ -198,41 +240,47 @@ export default function ProjectDetailPage() {
                 onUpdateSpend={handleUpdateSpend}
                 onUpdateDetail={handleUpdateDetail}
               />
-              <TableFooter>
-                <TableRow>
-                  <TableCell className="font-bold">Total Ressources</TableCell>
+              <TableFooter className="bg-muted/50 border-t-2 border-border">
+                <TableRow className="hover:bg-transparent">
+                  <TableCell className="font-black text-foreground py-6 px-6 uppercase text-xs tracking-widest">
+                    Total Ressources
+                  </TableCell>
                   {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-bold text-success">
-                      {formatNumber(r.price_resource)} Ar
+                    <TableCell key={r.id} className="text-right font-black text-success text-lg py-6">
+                      {formatNumber(r.price_resource)} <span className="text-[10px]">Ar</span>
                     </TableCell>
                   ))}
-                  <TableCell className="text-right font-bold text-success">
-                    {formatNumber(resourceTotal)} Ar
+                  <TableCell className="text-right font-black text-success text-xl py-6 px-6">
+                    {formatNumber(resourceTotal)} <span className="text-xs">Ar</span>
                   </TableCell>
                 </TableRow>
-                <TableRow>
-                  <TableCell className="font-bold">Total Dépenses</TableCell>
+                <TableRow className="hover:bg-transparent">
+                  <TableCell className="font-black text-foreground py-6 px-6 uppercase text-xs tracking-widest">
+                    Total Dépenses
+                  </TableCell>
                   {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-bold text-destructive">
-                      {formatNumber(r.used)} Ar
+                    <TableCell key={r.id} className="text-right font-black text-destructive text-lg py-6">
+                      {formatNumber(r.used)} <span className="text-[10px]">Ar</span>
                     </TableCell>
                   ))}
-                  <TableCell className="text-right font-bold text-destructive">
-                    {formatNumber(spendTotal)} Ar
+                  <TableCell className="text-right font-black text-destructive text-xl py-6 px-6">
+                    {formatNumber(spendTotal)} <span className="text-xs">Ar</span>
                   </TableCell>
                 </TableRow>
-                <TableRow>
-                  <TableCell className="font-bold">Restant</TableCell>
+                <TableRow className="hover:bg-transparent bg-primary/5">
+                  <TableCell className="font-black text-primary py-8 px-6 uppercase text-sm tracking-widest">
+                    Solde Restant
+                  </TableCell>
                   {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-bold">
-                      <span className={r.remaining < 0 ? "text-destructive" : "text-success"}>
-                        {formatNumber(r.remaining)} Ar
+                    <TableCell key={r.id} className="text-right font-black text-lg py-8">
+                      <span className={`px-3 py-1 rounded-full ${r.remaining < 0 ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success"}`}>
+                        {formatNumber(r.remaining)} <span className="text-[10px]">Ar</span>
                       </span>
                     </TableCell>
                   ))}
-                  <TableCell className="text-right font-bold">
-                    <span className={remainingTotal < 0 ? "text-destructive" : "text-success"}>
-                      {formatNumber(remainingTotal)} Ar
+                  <TableCell className="text-right font-black text-xl py-8 px-6">
+                    <span className={`px-4 py-2 rounded-full ${remainingTotal < 0 ? "bg-destructive/20 text-destructive" : "bg-success/20 text-success"}`}>
+                      {formatNumber(remainingTotal)} <span className="text-xs">Ar</span>
                     </span>
                   </TableCell>
                 </TableRow>

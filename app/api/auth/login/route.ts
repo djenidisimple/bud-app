@@ -1,20 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { comparePassword, createToken, setTokenCookie } from '@/lib/auth'
+import { z } from 'zod'
+
+const loginSchema = z.object({
+  name: z.string().min(1, 'Nom requis'),
+  password: z.string().min(1, 'Mot de passe requis'),
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, password } = await request.json()
+    const body = await request.json()
+    const { name, password } = loginSchema.parse(body)
 
-    if (!name || !password) {
-      return NextResponse.json(
-        { error: 'Nom et mot de passe requis' },
-        { status: 400 }
-      )
-    }
-
-    const db = await getDb()
-    const user = await db.prepare('SELECT * FROM "User" WHERE name = ?').get(name) as { id: number; name: string; password: string } | undefined
+    const user = await prisma.user.findUnique({
+      where: { name },
+    })
 
     if (!user || !(await comparePassword(password, user.password))) {
       return NextResponse.json(
@@ -33,7 +34,13 @@ export async function POST(request: NextRequest) {
     setTokenCookie(response, token)
 
     return response
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Données invalides', details: error.errors },
+        { status: 400 }
+      )
+    }
     return NextResponse.json(
       { error: 'Erreur lors de la connexion' },
       { status: 500 }

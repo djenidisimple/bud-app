@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDb } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { getSession } from '@/lib/auth'
+import { z } from 'zod'
+
+const projectSchema = z.object({
+  name_project: z.string().min(1, 'Le nom du projet est requis'),
+  description_project: z.string().optional().default(''),
+})
 
 export async function GET() {
   const session = await getSession()
@@ -8,8 +14,11 @@ export async function GET() {
     return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
   }
 
-  const db = await getDb()
-  const projects = await db.prepare('SELECT * FROM "Project" WHERE user_id = ? ORDER BY created_at DESC').all(session.id)
+  const projects = await prisma.project.findMany({
+    where: { user_id: session.id },
+    orderBy: { created_at: 'desc' },
+  })
+
   return NextResponse.json({ projects })
 }
 
@@ -20,26 +29,30 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { name_project, description_project } = await request.json()
+    const body = await request.json()
+    const { name_project, description_project } = projectSchema.parse(body)
 
-    if (!name_project) {
-      return NextResponse.json({ error: 'Le nom du projet est requis' }, { status: 400 })
-    }
+    const existing = await prisma.project.findUnique({
+      where: { name_project },
+    })
 
-    const db = await getDb()
-
-    const existing = await db.prepare('SELECT id FROM "Project" WHERE name_project = ?').get(name_project)
     if (existing) {
       return NextResponse.json({ error: 'Un projet avec ce nom existe déjà' }, { status: 409 })
     }
 
-    const result = await db.prepare(
-      'INSERT INTO "Project" (name_project, description_project, user_id) VALUES (?, ?, ?)'
-    ).run(name_project, description_project || '', session.id)
+    const project = await prisma.project.create({
+      data: {
+        name_project,
+        description_project,
+        user_id: session.id,
+      },
+    })
 
-    const project = await db.prepare('SELECT * FROM "Project" WHERE id = ?').get(result.lastInsertRowid)
     return NextResponse.json({ project, message: 'Projet créé avec succès' })
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Données invalides', details: error.errors }, { status: 400 })
+    }
     return NextResponse.json({ error: 'Erreur lors de la création du projet' }, { status: 500 })
   }
 }

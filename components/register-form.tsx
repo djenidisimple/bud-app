@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, User, Lock } from "lucide-react"
 import { toast } from "sonner"
 
 export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
@@ -27,7 +27,6 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
   }
 
   const strength = getStrength(password)
-
   const strengthLabel = ["Faible", "Moyen", "Bon", "Fort", "Très fort"][strength]
   const strengthColor = [
     "bg-destructive",
@@ -55,6 +54,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
     try {
       await register(name, password)
       toast.success("Inscription réussie")
+      if (onSuccess) onSuccess()
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Erreur d'inscription")
     } finally {
@@ -63,23 +63,29 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="reg-name">Nom d'utilisateur</Label>
-        <Input
-          id="reg-name"
-          placeholder="Entrez votre nom"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={loading}
-          autoComplete="username"
-        />
+        <Label htmlFor="reg-name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Nom d'utilisateur</Label>
+        <div className="relative group">
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input
+            id="reg-name"
+            className="pl-10 h-12 rounded-xl border-border/60 focus:ring-2 focus:ring-primary/20 transition-all"
+            placeholder="Entrez votre nom"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={loading}
+            autoComplete="username"
+          />
+        </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="reg-password">Mot de passe</Label>
-        <div className="relative">
+        <Label htmlFor="reg-password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Mot de passe</Label>
+        <div className="relative group">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input
             id="reg-password"
+            className="pl-10 pr-10 h-12 rounded-xl border-border/60 focus:ring-2 focus:ring-primary/20 transition-all"
             type={showPassword ? "text" : "password"}
             placeholder="Créez un mot de passe"
             value={password}
@@ -98,33 +104,37 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
           </Button>
         </div>
         {password && (
-          <div className="space-y-1">
-            <div className="flex gap-1">
+          <div className="space-y-2 px-1">
+            <div className="flex gap-1.5">
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className={`h-1 flex-1 rounded-full ${i < strength ? strengthColor : 'bg-muted'}`}
+                  className={`h-1 flex-1 rounded-full transition-all duration-500 ${i < strength ? strengthColor : 'bg-muted'}`}
                 />
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">Force: {strengthLabel}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Force: {strengthLabel}</p>
           </div>
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="reg-confirm">Confirmer le mot de passe</Label>
-        <Input
-          id="reg-confirm"
-          type="password"
-          placeholder="Confirmez le mot de passe"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          disabled={loading}
-          autoComplete="new-password"
-        />
+        <Label htmlFor="reg-confirm" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Confirmer le mot de passe</Label>
+        <div className="relative group">
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input
+            id="reg-confirm"
+            className="pl-10 h-12 rounded-xl border-border/60 focus:ring-2 focus:ring-primary/20 transition-all"
+            type="password"
+            placeholder="Confirmez le mot de passe"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            disabled={loading}
+            autoComplete="new-password"
+          />
+        </div>
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
+      <Button type="submit" className="w-full h-12 rounded-xl font-bold text-base shadow-lg shadow-primary/30 transition-transform hover:scale-[1.02] active:scale-95" disabled={loading}>
+        {loading && <Loader2 className="animate-spin mr-2 h-5 w-5" />}
         {loading ? "Inscription..." : "S'inscrire"}
       </Button>
     </form>
