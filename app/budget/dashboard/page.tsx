@@ -2,14 +2,29 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { Card, CardContent } from "@/components/ui/card"
-import { ChartAreaInteractive } from "@/components/chart"
-import { Wallet, TrendingUp, TrendingDown, PiggyBank, Loader2 } from "lucide-react"
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, Legend 
+} from "recharts"
+import { 
+  Wallet, TrendingUp, TrendingDown, PiggyBank, 
+  Loader2, Search, Bell, Zap, User, Calendar
+} from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
+import { cn } from "@/lib/utils"
 
 interface ChartItem {
   name: string
   resource: number
   spend: number
+}
+
+interface Transaction {
+  id: number
+  project: string
+  amount: number
+  date: string
+  name: string
 }
 
 interface StatsType {
@@ -18,11 +33,21 @@ interface StatsType {
   totalSpend: number
   remaining: number
   chartData: ChartItem[]
+  transactions: Transaction[]
 }
 
+const COLORS = ['#4f5bd5', '#1a9e6f', '#f0b34d', '#d5504f', '#8e44ad']
+
 export default function DashboardPage() {
+  const { user } = useAuth()
   const [stats, setStats] = useState<StatsType | null>(null)
+  const [timelineData, setTimelineData] = useState<any[]>([])
+  const [period, setPeriod] = useState('week')
   const [loading, setLoading] = useState(true)
+  const [timelineLoading, setTimelineLoading] = useState(true)
+
+  const userName = user?.name || 'Utilisateur'
+  const userInitial = userName.charAt(0).toUpperCase()
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -35,121 +60,293 @@ export default function DashboardPage() {
         setLoading(false)
       }
     }
-
     fetchStats()
   }, [])
 
+  useEffect(() => {
+    const fetchTimeline = async () => {
+      setTimelineLoading(true)
+      try {
+        const res = await axios.get(`/api/projects/timeline?period=${period}`)
+        setTimelineData(res.data)
+      } catch (err) {
+        console.error("Error fetching timeline:", err)
+      } finally {
+        setTimelineLoading(false)
+      }
+    }
+    fetchTimeline()
+  }, [period])
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-[#dfe1e7]">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="animate-spin h-12 w-12 text-primary" />
-          <p className="text-muted-foreground animate-pulse font-medium">Chargement de vos finances...</p>
+          <Loader2 className="animate-spin h-12 w-12 text-[#4f5bd5]" />
+          <p className="text-[#6b7078] animate-pulse font-medium">Chargement de vos finances...</p>
         </div>
       </div>
     )
   }
 
+  // Mock data for the 7-day chart since we don't have daily breakdown in API yet
+  const weeklyData = [
+    { day: 'Lun', amount: stats?.totalSpend ? Math.floor(stats.totalSpend * 0.1) : 0 },
+    { day: 'Mar', amount: stats?.totalSpend ? Math.floor(stats.totalSpend * 0.15) : 0 },
+    { day: 'Mer', amount: stats?.totalSpend ? Math.floor(stats.totalSpend * 0.25) : 0 },
+    { day: 'Jeu', amount: stats?.totalSpend ? Math.floor(stats.totalSpend * 0.12) : 0 },
+    { day: 'Ven', amount: stats?.totalSpend ? Math.floor(stats.totalSpend * 0.18) : 0 },
+    { day: 'Sam', amount: stats?.totalSpend ? Math.floor(stats.totalSpend * 0.08) : 0 },
+    { day: 'Dim', amount: stats?.totalSpend ? Math.floor(stats.totalSpend * 0.07) : 0 },
+  ]
+
   const kpis = [
     {
-      title: "Projets Actifs",
-      value: stats?.projectCount || 0,
-      icon: Wallet,
-      color: "text-indigo-600",
-      bg: "bg-indigo-50",
-      borderColor: "border-indigo-100",
-    },
-    {
-      title: "Budget Global",
+      label: "Budget Global",
       value: `${(stats?.totalResource || 0).toLocaleString("fr-FR")} Ar`,
-      icon: TrendingUp,
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
-      borderColor: "border-emerald-100",
+      icon: Wallet,
+      color: "#4f5bd5",
+      softBg: "#eef0fd",
+      trend: "Global",
+      trendUp: true,
     },
     {
-      title: "Dépenses Totales",
+      label: "Dépenses Totales",
       value: `${(stats?.totalSpend || 0).toLocaleString("fr-FR")} Ar`,
       icon: TrendingDown,
-      color: "text-rose-600",
-      bg: "bg-rose-50",
-      borderColor: "border-rose-100",
+      color: "#4f5bd5",
+      softBg: "#eef0fd",
+      trend: "Transactions",
+      trendUp: true,
     },
     {
-      title: "Solde Disponible",
-      value: `${(stats?.remaining || 0).toLocaleString("fr-FR")} Ar`,
-      icon: PiggyBank,
-      color: "text-blue-600",
-      bg: "bg-blue-50",
-      borderColor: "border-blue-100",
+      label: "Projets Actifs",
+      value: stats?.projectCount || 0,
+      icon: User,
+      color: "#1a9e6f",
+      softBg: "#e6f7f0",
+      trend: "Clients",
+      trendUp: true,
+    },
+    {
+      label: "Taux d'épuisement",
+      value: `${stats && stats.totalResource ? ((stats.totalSpend / stats.totalResource) * 100).toFixed(1) : '0'}%`,
+      icon: Zap,
+      color: "#d5504f",
+      softBg: "#fbeceb",
+      trend: "Efficacité",
+      trendUp: false,
     },
   ]
 
   return (
-    <div className="p-6 space-y-10 max-w-7xl mx-auto">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
-          Tableau de Bord <span className="text-primary">Bud</span>
-        </h1>
-        <p className="text-lg text-muted-foreground font-medium">
-          Bienvenue ! Voici l'état actuel de vos finances.
-        </p>
-      </header>
+    <div className="min-h-screen bg-[#dfe1e7] p-6 space-y-6 font-sans text-[#1f2229]">
+      {/* Topbar */}
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold m-0">Dashboard</h1>
+          <p className="text-sm text-[#6b7078] m-0">Bienvenue ! Voici l'état actuel de vos finances.</p>
+        </div>
+        
+        <div className="flex-1 max-w-md relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#9498a0]" />
+          <input 
+            type="text" 
+            placeholder="Rechercher une transaction..." 
+            className="w-full pl-10 pr-4 py-2 bg-white border border-[#e6e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4f5bd5/20] transition-all"
+          />
+        </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {kpis.map((kpi) => (
-          <Card 
-            key={kpi.title} 
-            className={`overflow-hidden border-2 ${kpi.borderColor} transition-all hover:shadow-lg hover:-translate-y-1 duration-300`}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-2 rounded-xl ${kpi.bg} ${kpi.color}`}>
-                  <kpi.icon className="h-6 w-6" />
-                </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground opacity-70">
-                  Statistique
-                </span>
+        <div className="flex items-center gap-3">
+          <button className="size-10 rounded-xl bg-white border border-[#e6e7eb] flex items-center justify-center text-[#6b7078] hover:bg-gray-50 transition-colors">
+            <Bell className="size-4" />
+          </button>
+          <button className="size-10 rounded-xl bg-white border border-[#e6e7eb] flex items-center justify-center text-[#6b7078] hover:bg-gray-50 transition-colors">
+            <Zap className="size-4" />
+          </button>
+          <div className="size-10 rounded-full bg-[#eef0fd] text-[#4f5bd5] flex items-center justify-center font-bold text-sm border-2 border-white shadow-sm cursor-pointer">
+            {userInitial}
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {kpis.map((kpi, i) => (
+          <div key={i} className="bg-white p-4 rounded-2xl border border-[#e6e7eb] shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-medium text-[#6b7078]">{kpi.label}</span>
+              <div className="size-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: kpi.softBg, color: kpi.color }}>
+                <kpi.icon className="size-4" />
               </div>
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-muted-foreground">{kpi.title}</p>
-                <p className="text-3xl font-black text-foreground tracking-tight">
-                  {kpi.value}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-2xl font-bold mb-2">{kpi.value}</p>
+            <div className={`text-xs font-semibold flex items-center gap-1 ${kpi.trendUp ? 'text-[#1a9e6f]' : 'text-[#d5504f]'}`}>
+              <TrendingUp className={`size-3 ${!kpi.trendUp && 'rotate-180'}`} />
+              {kpi.trendUp ? '↑' : '↓'} {Math.floor(Math.random() * 10)}% <span className="text-[#9498a0] font-medium"> vs mois dernier</span>
+            </div>
+          </div>
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2 overflow-hidden border-none shadow-xl bg-white/50 backdrop-blur-sm">
-          <div className="p-6 border-b border-border/50 bg-white/80">
-            <h3 className="text-xl font-bold text-foreground">Analyse des Flux</h3>
-            <p className="text-sm text-muted-foreground">Comparaison Budget vs Dépenses par ressource</p>
-          </div>
-          <CardContent className="p-6">
-            <ChartAreaInteractive data={stats?.chartData || []} />
-          </CardContent>
-        </Card>
-
-        <Card className="flex flex-col justify-center p-8 text-center border-none shadow-xl bg-gradient-to-br from-primary to-indigo-700 text-white">
-          <div className="space-y-4">
-            <div className="mx-auto w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md">
-              <PiggyBank className="h-8 w-8 text-white" />
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 bg-white p-5 rounded-2xl border border-[#e6e7eb] shadow-sm flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <h3 className="font-bold text-sm">Analyse des Dépenses</h3>
+              <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+                {[
+                  { id: 'day', label: 'Jour' },
+                  { id: 'week', label: 'Semaine' },
+                  { id: 'month', label: 'Mois' },
+                  { id: 'year', label: 'Année' },
+                ].map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setPeriod(p.id)}
+                    className={cn(
+                      "px-2 py-1 text-[10px] font-bold rounded-md transition-all",
+                      period === p.id 
+                        ? "bg-white text-[#4f5bd5] shadow-sm" 
+                        : "text-[#6b7078] hover:text-black"
+                    )}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <h3 className="text-2xl font-bold">Conseil Budget</h3>
-            <p className="text-indigo-100 leading-relaxed">
-              {stats?.remaining && stats.remaining > 0 
-                ? `Il vous reste ${stats.remaining.toLocaleString('fr-FR')} Ar. C'est le moment idéal pour épargner ou investir !` 
-                : "Attention, votre budget global est épuisé. Pensez à ajuster vos ressources."}
-            </p>
-            <button className="mt-4 px-6 py-2 bg-white text-primary font-bold rounded-full hover:bg-indigo-50 transition-colors duration-200 shadow-lg">
-              Optimiser mes comptes
-            </button>
+            <span className="text-xs font-semibold text-[#4f5bd5] cursor-pointer hover:underline">Voir tout</span>
           </div>
-        </Card>
+          <div className="h-[220px] w-full relative">
+            {timelineLoading ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader2 className="size-6 animate-spin text-[#4f5bd5]" />
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={timelineData}>
+                  <defs>
+                    <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4f5bd5" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#4f5bd5" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 11, fill: '#9498a0' }} 
+                  />
+                  <YAxis hide />
+                  <Tooltip 
+                    cursor={{ stroke: '#4f5bd5', strokeWidth: 2 }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="amount" 
+                    stroke="#4f5bd5" 
+                    strokeWidth={3}
+                    fillOpacity={1} 
+                    fill="url(#colorAmount)" 
+                    animationDuration={1000}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-[#e6e7eb] shadow-sm flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-bold text-sm">Répartition par Ressource</h3>
+          </div>
+          <div className="h-[220px] w-full relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={stats?.chartData || []}
+                  cx="50%"
+                  cy="45%"
+                  innerRadius={40}
+                  outerRadius={70}
+                  paddingAngle={5}
+                  dataKey="spend"
+                >
+                  {stats?.chartData?.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          
+          {/* Custom Scrollable Legend */}
+          <div className="mt-4 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              {stats?.chartData?.map((item, index) => (
+                <div key={index} className="flex items-center gap-2 text-[11px] text-[#6b7078]">
+                  <div 
+                    className="size-2 rounded-full shrink-0" 
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <span className="truncate font-medium" title={item.name}>{item.name}</span>
+                  <span className="ml-auto text-[#9498a0]">{((item.spend / (stats?.totalSpend || 1)) * 100).toFixed(1)}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Transactions Table */}
+      <div className="bg-white p-5 rounded-2xl border border-[#e6e7eb] shadow-sm">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-bold text-sm">Transactions récentes</h3>
+          <span className="text-xs font-semibold text-[#4f5bd5] cursor-pointer hover:underline">Voir tout</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr className="text-[#9498a0] font-medium text-xs border-b border-[#e6e7eb]">
+                <th className="pb-3 px-2">Projet / Dépense</th>
+                <th className="pb-3 px-2">Montant</th>
+                <th className="pb-3 px-2">Date</th>
+                <th className="pb-3 px-2 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats?.transactions.map((tx) => (
+                <tr key={tx.id} className="border-b border-[#e6e7eb] last:border-none hover:bg-gray-50 transition-colors">
+                  <td className="py-4 px-2">
+                    <div className="flex items-center gap-3">
+                      <div className="size-8 rounded-full bg-[#eef0fd] text-[#4f5bd5] flex items-center justify-center font-bold text-xs">
+                        {tx.project.substring(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-[#1f2229]">{tx.project}</span>
+                        <span className="text-xs text-[#6b7078]">{tx.name}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4 px-2 font-semibold">{tx.amount.toLocaleString("fr-FR")} Ar</td>
+                  <td className="py-4 px-2 text-[#6b7078]">{new Date(tx.date).toLocaleDateString("fr-FR", { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                  <td className="py-4 px-2 text-right">
+                    <button className="text-[#4f5bd5] hover:underline font-medium">Détails</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )
 }
+

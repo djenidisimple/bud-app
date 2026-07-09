@@ -46,11 +46,41 @@ export async function GET() {
     ...value,
   }))
 
+  const recentTransactions = await prisma.spend.findMany({
+    where: { project: { user_id: session.id as number } },
+    orderBy: { created_at: 'desc' },
+    take: 5,
+    include: {
+      project: true,
+      details: {
+        include: {
+          makes: true,
+        },
+      },
+    },
+  })
+
+  const transactions = recentTransactions.map((spend) => {
+    const amount = spend.details.reduce(
+      (sum, detail) =>
+        sum + detail.makes.reduce((s, m) => s + (Number(m.price_spend) || 0), 0),
+      0
+    )
+    return {
+      id: spend.id,
+      project: spend.project.name_project,
+      amount,
+      date: spend.created_at,
+      name: spend.name_spend,
+    }
+  })
+
   return NextResponse.json({
     projectCount: projects.length,
     totalResource,
     totalSpend,
     remaining: totalResource - totalSpend,
     chartData,
+    transactions,
   })
 }

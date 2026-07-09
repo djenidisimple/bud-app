@@ -4,11 +4,10 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
 import { Plus, Pencil, Trash2, Wallet, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ProjectForm } from "@/components/projet-forms"
 import { ProjectDelete } from "@/components/project-delete"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 import type { Project } from "@/types"
 
@@ -67,71 +66,77 @@ export function DataProject() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin h-8 w-8 text-primary" />
+        <Loader2 className="animate-spin h-8 w-8 text-[#4f5bd5]" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-8 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Mes Projets</h1>
-          <p className="text-muted-foreground">Gérez vos projets budgétaires</p>
+          <h1 className="text-2xl font-bold text-[#1f2229] m-0">Mes Projets</h1>
+          <p className="text-sm text-[#6b7078] m-0">Gérez vos projets budgétaires</p>
         </div>
-        <Button onClick={() => setShowCreate(true)}>
-          <Plus className="mr-2 h-4 w-4" />
+        <button 
+          onClick={() => setShowCreate(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-[#4f5bd5] text-white text-sm font-bold rounded-xl hover:bg-[#3d48b3] transition-all shadow-sm"
+        >
+          <Plus className="size-4" />
           Nouveau projet
-        </Button>
+        </button>
       </div>
 
       {projects.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Wallet className="h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-lg font-medium">Aucun projet</p>
-            <p className="text-sm text-muted-foreground mb-4">Créez votre premier projet budgétaire</p>
-            <Button onClick={() => setShowCreate(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Créer un projet
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-2xl border border-[#e6e7eb] p-12 flex flex-col items-center justify-center text-center shadow-sm">
+          <div className="w-16 h-16 rounded-full bg-[#eef0fd] text-[#4f5bd5] flex items-center justify-center mb-4">
+            <Wallet className="size-8" />
+          </div>
+          <p className="text-xl font-bold text-[#1f2229] mb-1">Aucun projet</p>
+          <p className="text-sm text-[#6b7078] mb-6">Créez votre premier projet budgétaire pour commencer</p>
+          <button 
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-2 px-6 py-2 bg-[#4f5bd5] text-white text-sm font-bold rounded-xl hover:bg-[#3d48b3] transition-all shadow-sm"
+          >
+            <Plus className="size-4" />
+            Créer un projet
+          </button>
+        </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
-            <Card
+            <div
               key={project.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/budget/transaction/${project.id}`) }}
               onClick={() => router.push(`/budget/transaction/${project.id}`)}
+              className="bg-white p-5 rounded-2xl border border-[#e6e7eb] shadow-sm hover:shadow-md transition-all cursor-pointer group relative"
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg">{project.name_project}</CardTitle>
-                  <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setEditProject(project)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeleteProject(project)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
+              <div className="flex items-start justify-between mb-3">
+                <h3 className="font-bold text-[#1f2229] text-lg truncate pr-8">{project.name_project}</h3>
+                <div className="flex gap-1 absolute top-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setEditProject(project) }}
+                    className="p-1.5 rounded-lg hover:bg-gray-100 text-[#6b7078] transition-colors"
+                  >
+                    <Pencil className="size-4" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setDeleteProject(project) }}
+                    className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
                 </div>
-                <CardDescription>
-                  {project.description_project || "Aucune description"}
-                </CardDescription>
-              </CardHeader>
-            </Card>
+              </div>
+              <p className="text-sm text-[#6b7078] line-clamp-2 mb-4">
+                {project.description_project || "Aucune description fournie pour ce projet."}
+              </p>
+              <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cliquez pour gérer</span>
+                <div className="size-6 rounded-full bg-[#eef0fd] text-[#4f5bd5] flex items-center justify-center">
+                  <Wallet className="size-3" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       )}

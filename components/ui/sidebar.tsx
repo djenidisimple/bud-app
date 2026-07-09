@@ -12,9 +12,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3rem"
+const SIDEBAR_RAIL_WIDTH = "72px"
+const SIDEBAR_PANEL_WIDTH = "300px"
+const SIDEBAR_WIDTH_MOBILE = "288px"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 interface SidebarContextValue {
@@ -43,7 +43,7 @@ interface SidebarProviderProps extends React.ComponentPropsWithoutRef<"div"> {
 const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderProps>(
   (
     {
-      defaultOpen = true,
+      defaultOpen = false,
       open: openProp,
       onOpenChange: setOpenProp,
       className,
@@ -65,21 +65,6 @@ const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderProps>(
       }
     }, [])
 
-    const handleKeyDown = React.useCallback(
-      (event: KeyboardEvent) => {
-        if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
-          event.preventDefault()
-          setOpen((prev) => !prev)
-        }
-      },
-      []
-    )
-
-    React.useEffect(() => {
-      document.addEventListener("keydown", handleKeyDown)
-      return () => document.removeEventListener("keydown", handleKeyDown)
-    }, [handleKeyDown])
-
     const setOpenWithCookie = React.useCallback((value: boolean) => {
       setOpen(value)
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${value}; max-age=${SIDEBAR_COOKIE_MAX_AGE}; path=/`
@@ -89,11 +74,12 @@ const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderProps>(
       <SidebarContext.Provider value={{ open, setOpen: setOpenWithCookie, collapsible, setCollapsible }}>
         <div
           style={{
-            "--sidebar-width": SIDEBAR_WIDTH,
-            "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+            "--sidebar-width": SIDEBAR_PANEL_WIDTH,
+            "--sidebar-width-icon": SIDEBAR_RAIL_WIDTH,
             ...style,
           } as React.CSSProperties}
           data-collapsible={collapsible}
+          data-state={open ? "expanded" : "collapsed"}
           className={cn("group/sidebar-wrapper flex min-h-svh w-full", className)}
           ref={ref}
           {...props}
@@ -136,7 +122,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
           <SheetContent
             side={side}
             className="p-0 [&>button]:hidden"
-            style={{ "--sidebar-width": SIDEBAR_WIDTH_MOBILE } as React.CSSProperties}
+            style={{ width: SIDEBAR_PANEL_WIDTH } as React.CSSProperties}
           >
             <SidebarContent>{children}</SidebarContent>
           </SheetContent>
@@ -147,17 +133,20 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
           data-side={side}
           data-variant={variant}
           data-collapsible={collapsible}
-          className={cn(
-            "peer hidden md:block",
-            open ? "w-[--sidebar-width]" : "w-[--sidebar-width-icon]",
-            "relative"
-          )}
+            className={cn(
+              "peer hidden md:flex",
+              "fixed left-4 top-4 bottom-4 z-40",
+              open ? "w-[calc(var(--sidebar-width-icon,64px)+var(--sidebar-width,320px))]" : "w-[var(--sidebar-width-icon,64px)]",
+              "transition-all duration-300 ease-in-out",
+              className
+            )}
+
           {...props}
         >
           <div
             data-sidebar="sidebar"
             className={cn(
-              "flex h-full flex-col bg-sidebar text-sidebar-foreground",
+              "flex h-full flex-col bg-white text-sidebar-foreground shadow-sm rounded-[20px] border border-sidebar-border overflow-hidden",
               "group-data-[collapsible=icon]:overflow-hidden"
             )}
           >
@@ -242,17 +231,17 @@ const SidebarMenuItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-xl p-2 text-left text-sm outline-none ring-sidebar-ring transition-all duration-200 hover:bg-gray-100 focus-visible:ring-2 active:bg-gray-100 disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-white data-[active=true]:shadow-sm data-[active=true]:font-semibold data-[active=true]:text-black data-[state=open]:hover:bg-gray-100 data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-10 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-5 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        default: "text-gray-500 hover:text-black",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-gray-100 hover:text-black hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
-        default: "h-8 text-sm",
-        sm: "h-7 text-xs",
+        default: "h-11 text-sm",
+        sm: "h-9 text-xs",
         lg: "h-12 text-sm group-data-[collapsible=icon]:!p-0",
       },
     },
@@ -452,8 +441,9 @@ const SidebarInset = React.forwardRef<HTMLElement, React.ComponentPropsWithoutRe
     <main
       ref={ref}
       className={cn(
-        "relative flex min-h-svh flex-1 flex-col bg-background",
-        "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
+        "relative flex min-h-svh flex-1 flex-col bg-background transition-all duration-300 ease-in-out",
+        "pl-0 md:pl-[calc(var(--sidebar-width-icon,64px)+32px)]",
+        "group-data-[state=expanded]/sidebar-wrapper:md:pl-[calc(var(--sidebar-width,320px)+var(--sidebar-width-icon,64px)+32px)]",
         className
       )}
       {...props}

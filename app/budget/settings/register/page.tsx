@@ -8,28 +8,28 @@ import { Button } from "@/components/ui/button"
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-svh items-center justify-center p-4 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-background to-background">
-      <Card className="w-full max-w-md border-none shadow-2xl bg-white/80 backdrop-blur-xl rounded-[2rem] overflow-hidden">
-        <CardHeader className="text-center pt-10 pb-6 px-10">
+    <div className="flex min-h-screen items-center justify-center p-4 bg-[#dfe1e7]">
+      <div className="w-full max-w-md bg-white border border-[#e6e7eb] shadow-sm rounded-2xl overflow-hidden">
+        <div className="text-center pt-10 pb-6 px-10">
           <div className="flex justify-center mb-6">
-            <div className="flex aspect-square size-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/40 transform rotate-3">
-              <GalleryVerticalEnd className="size-8" />
+            <div className="flex aspect-square size-16 items-center justify-center rounded-2xl bg-[#4f5bd5] text-white shadow-sm transform rotate-3">
+               <GalleryVerticalEnd className="size-8" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-black tracking-tight text-foreground mb-2">
+          <h2 className="text-2xl font-bold text-[#1f2229] mb-2">
             Nouvel Accès
-          </CardTitle>
-          <CardDescription className="text-base font-medium text-muted-foreground">
+          </h2>
+          <p className="text-sm font-medium text-[#6b7078]">
             Configurez un nouvel utilisateur pour votre espace BudApp
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-10 pb-10">
+          </p>
+        </div>
+        <div className="px-10 pb-10">
           <RegisterForm />
-          <div className="mt-8 pt-6 border-t border-border/60 flex justify-center">
+          <div className="mt-8 pt-6 border-t border-[#e6e7eb] flex justify-center">
             <Button 
               variant="ghost" 
               asChild 
-              className="text-muted-foreground font-bold hover:text-primary transition-colors"
+              className="text-[#6b7078] font-medium hover:text-[#4f5bd5] transition-colors"
             >
               <Link href="/budget/settings" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
@@ -37,8 +37,8 @@ export default function RegisterPage() {
               </Link>
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

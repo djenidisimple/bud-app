@@ -44,27 +44,28 @@ export function NavUser() {
             <SidebarMenuButton
               size="lg"
               tooltip={!open ? user.name : undefined}
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="h-14 rounded-2xl bg-gray-50 hover:bg-gray-100 border border-gray-100 p-2 transition-all group"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+              <Avatar className="h-9 w-9 rounded-full border-2 border-white shadow-sm">
+                <AvatarFallback className="rounded-full bg-indigo-100 text-indigo-600">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-bold text-black">{user.name}</span>
+                <span className="truncate text-xs text-gray-500">Pro trial</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
+              <ChevronsUpDown className="ml-auto size-4 text-gray-400 group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-xl"
             side="right"
             align="end"
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+                <Avatar className="h-8 w-8 rounded-full">
+                  <AvatarFallback className="rounded-full">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -73,16 +74,16 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
                 <Link href="/budget/profile">
-                  <BadgeCheck />
+                  <BadgeCheck className="size-4" />
                   Profil
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
-              <LogOut />
+            <DropdownMenuItem onClick={logout} className="rounded-lg cursor-pointer text-red-500 focus:text-red-500">
+              <LogOut className="size-4" />
               Déconnexion
             </DropdownMenuItem>
           </DropdownMenuContent>

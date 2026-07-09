@@ -141,10 +141,10 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-screen bg-[#dfe1e7]">
         <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
-          <p className="text-muted-foreground animate-pulse font-medium">Chargement du projet...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#4f5bd5]" />
+          <p className="text-[#6b7078] animate-pulse font-medium">Chargement du projet...</p>
         </div>
       </div>
     )
@@ -161,15 +161,15 @@ export default function ProjectDetailPage() {
   const remainingTotal = remainingResources.reduce((sum, r) => sum + (r.remaining || 0), 0)
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto p-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-3xl shadow-sm border border-border/60">
+    <div className="min-h-screen bg-[#dfe1e7] p-6 space-y-6 font-sans text-[#1f2229]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-2xl shadow-sm border border-[#e6e7eb]">
         <div className="space-y-2">
-          <div className="flex items-center gap-3 text-primary font-bold text-sm uppercase tracking-widest">
+          <div className="flex items-center gap-3 text-[#4f5bd5] font-bold text-xs uppercase tracking-wider">
             <LayoutDashboard className="h-4 w-4" />
             <span>Gestion Budgétaire</span>
           </div>
-          <h1 className="text-4xl font-black text-foreground tracking-tight">{project.name_project}</h1>
-          <p className="text-muted-foreground text-lg font-medium">{project.description_project}</p>
+          <h1 className="text-2xl font-bold text-[#1f2229]">{project.name_project}</h1>
+          <p className="text-sm text-[#6b7078] font-medium">{project.description_project}</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <div className="flex items-center gap-2 mr-2">
@@ -191,7 +191,7 @@ export default function ProjectDetailPage() {
           <Button 
             onClick={handleSave} 
             disabled={saving}
-            className="h-12 px-8 rounded-full bg-primary text-white font-bold hover:bg-primary/90 transition-all hover:scale-105 shadow-lg flex items-center gap-2"
+            className="h-12 px-8 rounded-xl bg-[#4f5bd5] text-white font-bold hover:bg-[#3f4bb5] transition-all flex items-center gap-2"
           >
             {saving ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
             {saving ? "Sauvegarde..." : "Enregistrer les modifications"}
@@ -199,26 +199,26 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
-      <Card className="overflow-hidden border-none shadow-2xl bg-white/80 backdrop-blur-md rounded-3xl">
-        <CardHeader className="pb-6 bg-muted/30 border-b border-border/60 px-8">
+      <div className="bg-white border border-[#e6e7eb] shadow-sm rounded-2xl overflow-hidden">
+        <div className="pb-6 bg-gray-50 border-b border-[#e6e7eb] px-6">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-black text-foreground flex items-center gap-3">
-              <FileText className="h-6 w-6 text-primary" />
+            <div className="text-lg font-bold text-[#1f2229] flex items-center gap-3">
+              <FileText className="h-6 w-6 text-[#4f5bd5]" />
               Tableau d'Allocation
-            </CardTitle>
+            </div>
             <div className="flex items-center gap-4 text-sm font-bold">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-success" />
-                <span className="text-muted-foreground">Ressources</span>
+                <div className="w-3 h-3 rounded-full bg-[#1a9e6f]" />
+                <span className="text-[#6b7078]">Ressources</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-destructive" />
-                <span className="text-muted-foreground">Dépenses</span>
+                <div className="w-3 h-3 rounded-full bg-[#d5504f]" />
+                <span className="text-[#6b7078]">Dépenses</span>
               </div>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
+        </div>
+        <div className="p-0">
           <div className="overflow-auto">
             <Table>
               <TableHeaderComponent
@@ -240,46 +240,46 @@ export default function ProjectDetailPage() {
                 onUpdateSpend={handleUpdateSpend}
                 onUpdateDetail={handleUpdateDetail}
               />
-              <TableFooter className="bg-muted/50 border-t-2 border-border">
+              <TableFooter className="bg-gray-50 border-t-2 border-[#e6e7eb]">
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="font-black text-foreground py-6 px-6 uppercase text-xs tracking-widest">
+                  <TableCell className="font-bold text-[#1f2229] py-6 px-6 uppercase text-xs tracking-wider">
                     Total Ressources
                   </TableCell>
                   {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-black text-success text-lg py-6">
+                    <TableCell key={r.id} className="text-right font-bold text-[#1a9e6f] text-lg py-6">
                       {formatNumber(r.price_resource)} <span className="text-[10px]">Ar</span>
                     </TableCell>
                   ))}
-                  <TableCell className="text-right font-black text-success text-xl py-6 px-6">
+                  <TableCell className="text-right font-bold text-[#1a9e6f] text-xl py-6 px-6">
                     {formatNumber(resourceTotal)} <span className="text-xs">Ar</span>
                   </TableCell>
                 </TableRow>
                 <TableRow className="hover:bg-transparent">
-                  <TableCell className="font-black text-foreground py-6 px-6 uppercase text-xs tracking-widest">
+                  <TableCell className="font-bold text-[#1f2229] py-6 px-6 uppercase text-xs tracking-wider">
                     Total Dépenses
                   </TableCell>
                   {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-black text-destructive text-lg py-6">
+                    <TableCell key={r.id} className="text-right font-bold text-[#d5504f] text-lg py-6">
                       {formatNumber(r.used)} <span className="text-[10px]">Ar</span>
                     </TableCell>
                   ))}
-                  <TableCell className="text-right font-black text-destructive text-xl py-6 px-6">
+                  <TableCell className="text-right font-bold text-[#d5504f] text-xl py-6 px-6">
                     {formatNumber(spendTotal)} <span className="text-xs">Ar</span>
                   </TableCell>
                 </TableRow>
-                <TableRow className="hover:bg-transparent bg-primary/5">
-                  <TableCell className="font-black text-primary py-8 px-6 uppercase text-sm tracking-widest">
+                <TableRow className="hover:bg-transparent bg-[#eef0fd]">
+                  <TableCell className="font-bold text-[#4f5bd5] py-8 px-6 uppercase text-sm tracking-wider">
                     Solde Restant
                   </TableCell>
                   {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-black text-lg py-8">
-                      <span className={`px-3 py-1 rounded-full ${r.remaining < 0 ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success"}`}>
+                    <TableCell key={r.id} className="text-right font-bold text-lg py-8">
+                      <span className={`px-3 py-1 rounded-full ${r.remaining < 0 ? "bg-[#d5504f]/10 text-[#d5504f]" : "bg-[#1a9e6f]/10 text-[#1a9e6f]"}`}>
                         {formatNumber(r.remaining)} <span className="text-[10px]">Ar</span>
                       </span>
                     </TableCell>
                   ))}
-                  <TableCell className="text-right font-black text-xl py-8 px-6">
-                    <span className={`px-4 py-2 rounded-full ${remainingTotal < 0 ? "bg-destructive/20 text-destructive" : "bg-success/20 text-success"}`}>
+                  <TableCell className="text-right font-bold text-xl py-8 px-6">
+                    <span className={`px-4 py-2 rounded-full ${remainingTotal < 0 ? "bg-[#d5504f]/20 text-[#d5504f]" : "bg-[#1a9e6f]/20 text-[#1a9e6f]"}`}>
                       {formatNumber(remainingTotal)} <span className="text-xs">Ar</span>
                     </span>
                   </TableCell>
@@ -287,8 +287,8 @@ export default function ProjectDetailPage() {
               </TableFooter>
             </Table>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
