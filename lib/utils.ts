@@ -55,3 +55,11 @@ const MONTHS_FR = [
 ]
 
 export { MONTHS_FR }
+
+export function parseIntParam(value: string): number {
+  const parsed = parseInt(value, 10)
+  if (isNaN(parsed)) {
+    throw new Error('ID invalide')
+  }
+  return parsed
+}

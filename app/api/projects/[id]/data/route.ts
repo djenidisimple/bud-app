@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { z } from 'zod'
+import { parseIntParam } from '@/lib/utils'
 
 const resourceSchema = z.object({
   id: z.number().optional(),
@@ -43,67 +44,74 @@ const dataSchema = z.object({
 })
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await getSession()
-  if (!session) {
-    return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+  try {
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
+    }
+
+    const { id } = await params
+    const projectId = parseIntParam(id)
+
+    const project = await prisma.project.findFirst({
+      where: { id: projectId, user_id: session.id as number },
+    })
+
+    if (!project) {
+      return NextResponse.json({ error: 'Projet non trouvé' }, { status: 404 })
+    }
+
+    const resources = await prisma.resource.findMany({ where: { project_id: projectId } })
+    const spends = await prisma.spend.findMany({ where: { project_id: projectId } })
+    const details = await prisma.detail.findMany({
+      where: { spend: { project_id: projectId } },
+      include: { spend: true },
+    })
+
+    const makes = await prisma.make.findMany({
+      where: {
+        detail: { spend: { project_id: projectId } },
+        resource: { project_id: projectId },
+      },
+      include: {
+        detail: true,
+        resource: true,
+      },
+    })
+
+    const totalResource = resources.reduce((sum, r) => sum + r.price_resource, 0)
+    const totalSpend = makes.reduce((sum, m) => sum + m.price_spend, 0)
+
+    const detailSpend = details.map(d => {
+      const total = makes
+        .filter(m => m.detail_id === d.id)
+        .reduce((sum, m) => sum + m.price_spend, 0)
+      return { ...d, name_spend: d.spend.name_spend, total }
+    })
+
+    const stayResource = resources.map(r => {
+      const used = makes
+        .filter(m => m.resource_id === r.id)
+        .reduce((sum, m) => sum + m.price_spend, 0)
+      return { ...r, stay: r.price_resource - used }
+    })
+
+    return NextResponse.json({
+      project,
+      resources,
+      spends,
+      details,
+      makes,
+      budget: { totalResource, totalSpend, remaining: totalResource - totalSpend },
+      detailSpend,
+      stayResource,
+    })
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+    return NextResponse.json({ error: 'Erreur lors de la récupération des données' }, { status: 500 })
   }
-
-  const { id } = await params
-  const projectId = parseInt(id)
-
-  const project = await prisma.project.findFirst({
-    where: { id: projectId, user_id: session.id },
-  })
-
-  if (!project) {
-    return NextResponse.json({ error: 'Projet non trouvé' }, { status: 404 })
-  }
-
-  const resources = await prisma.resource.findMany({ where: { project_id: projectId } })
-  const spends = await prisma.spend.findMany({ where: { project_id: projectId } })
-  const details = await prisma.detail.findMany({
-    where: { spend: { project_id: projectId } },
-    include: { spend: true },
-  })
-
-  const makes = await prisma.make.findMany({
-    where: {
-      detail: { spend: { project_id: projectId } },
-      resource: { project_id: projectId },
-    },
-    include: {
-      detail: true,
-      resource: true,
-    },
-  })
-
-  const totalResource = resources.reduce((sum, r) => sum + r.price_resource, 0)
-  const totalSpend = makes.reduce((sum, m) => sum + m.price_spend, 0)
-
-  const detailSpend = details.map(d => {
-    const total = makes
-      .filter(m => m.detail_id === d.id)
-      .reduce((sum, m) => sum + m.price_spend, 0)
-    return { ...d, name_spend: d.spend.name_spend, total }
-  })
-
-  const stayResource = resources.map(r => {
-    const used = makes
-      .filter(m => m.resource_id === r.id)
-      .reduce((sum, m) => sum + m.price_spend, 0)
-    return { ...r, stay: r.price_resource - used }
-  })
-
-  return NextResponse.json({
-    project,
-    resources,
-    spends,
-    details,
-    makes,
-    budget: { totalResource, totalSpend, remaining: totalResource - totalSpend },
-    detailSpend,
-    stayResource,
-  })
 }
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -113,10 +121,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   const { id } = await params
-  const projectId = parseInt(id)
+  const projectId = parseIntParam(id)
 
   const project = await prisma.project.findFirst({
-    where: { id: projectId, user_id: session.id },
+    where: { id: projectId, user_id: session.id as number },
   })
 
   if (!project) {
@@ -213,7 +221,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ message: 'Données sauvegardées avec succès' })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Données invalides', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Données invalides', details: error.issues }, { status: 400 })
     }
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
