@@ -64,6 +64,15 @@ module.exports = {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
+        // Custom Design System Colors
+        brand: {
+          lavender: "#E8E9F0",
+          dark: "#1A1A1A",
+          gray: "#6B7280",
+          indigo: "#4F46E5",
+          violet: "#6366F1",
+          separator: "#EAEAEF",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

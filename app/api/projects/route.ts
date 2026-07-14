@@ -15,11 +15,28 @@ export async function GET() {
   }
 
   const projects = await prisma.project.findMany({
-    where: { user_id: session.id },
+    where: { user_id: session.id as number },
     orderBy: { created_at: 'desc' },
   })
 
-  return NextResponse.json({ projects })
+  const projectsWithBudget = await Promise.all(projects.map(async (project) => {
+    const resources = await prisma.resource.findMany({
+      where: { project_id: project.id },
+      include: { makes: true },
+    })
+    const totalResource = resources.reduce((sum, r) => sum + r.price_resource, 0)
+    const totalSpend = resources.reduce((sum, r) =>
+      sum + r.makes.reduce((s, m) => s + m.price_spend, 0), 0
+    )
+    return {
+      ...project,
+      totalResource,
+      totalSpend,
+      remaining: totalResource - totalSpend,
+    }
+  }))
+
+  return NextResponse.json({ projects: projectsWithBudget })
 }
 
 export async function POST(request: NextRequest) {
@@ -44,14 +61,14 @@ export async function POST(request: NextRequest) {
       data: {
         name_project,
         description_project,
-        user_id: session.id,
+        user_id: session.id as number,
       },
     })
 
     return NextResponse.json({ project, message: 'Projet créé avec succès' })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Données invalides', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Données invalides', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Erreur lors de la création du projet' }, { status: 500 })
   }

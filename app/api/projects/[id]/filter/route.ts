@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { z } from 'zod'
+import { parseIntParam } from '@/lib/utils'
 
 const filterSchema = z.object({
   month: z.string().optional(),
@@ -15,10 +16,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   const { id } = await params
-  const projectId = parseInt(id)
+  const projectId = parseIntParam(id)
 
   const project = await prisma.project.findFirst({
-    where: { id: projectId, user_id: session.id },
+    where: { id: projectId, user_id: session.id as number },
   })
 
   if (!project) {
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Données invalides', details: error.errors }, { status: 400 })
+      return NextResponse.json({ error: 'Données invalides', details: error.issues }, { status: 400 })
     }
     return NextResponse.json({ error: 'Erreur lors du filtrage' }, { status: 500 })
   }
