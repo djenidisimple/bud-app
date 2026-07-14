@@ -9,6 +9,7 @@ import {
   Sparkles,
   ChevronLeft,
   Plus,
+  User,
 } from "lucide-react"
 import {
   Sidebar,
@@ -35,9 +36,19 @@ const data = {
       icon: LayoutDashboard,
     },
     {
+      title: "Suivi",
+      url: "/budget/attendance",
+      icon: GalleryVerticalEnd,
+    },
+    {
       title: "Projets",
       url: "/budget/transaction",
       icon: Wallet,
+    },
+    {
+      title: "Profil",
+      url: "/budget/profile",
+      icon: User,
     },
     {
       title: "Paramètres",

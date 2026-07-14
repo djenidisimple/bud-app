@@ -50,41 +50,30 @@ export default function ProjectDetailPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const requests: Promise<any>[] = []
+      const payload: {
+        resources?: ResourceType[]
+        spends?: SpendType[]
+        details?: DetailType[]
+        makes?: MakeType[]
+      } = {}
 
-      // Resources
-      resources.forEach(r => {
-        if (r._delete && r.id) requests.push(axios.delete(`/api/projects/${projectId}/resources/${r.id}`))
-        else if (r._new) requests.push(axios.post(`/api/projects/${projectId}/resources`, r))
-        else if (r.id) requests.push(axios.patch(`/api/projects/${projectId}/resources/${r.id}`, r))
-      })
+      const modifiedResources = resources.filter(r => r._delete || r._new || r.id)
+      if (modifiedResources.length > 0) payload.resources = modifiedResources
 
-      // Spends
-      spends.forEach(s => {
-        if (s._delete && s.id) requests.push(axios.delete(`/api/projects/${projectId}/spends/${s.id}`))
-        else if (s._new) requests.push(axios.post(`/api/projects/${projectId}/spends`, s))
-        else if (s.id) requests.push(axios.patch(`/api/projects/${projectId}/spends/${s.id}`, s))
-      })
+      const modifiedSpends = spends.filter(s => s._delete || s._new || s.id)
+      if (modifiedSpends.length > 0) payload.spends = modifiedSpends
 
-      // Details
-      details.forEach(d => {
-        if (d._delete && d.id) requests.push(axios.delete(`/api/projects/${projectId}/details/${d.id}`))
-        else if (d._new) requests.push(axios.post(`/api/projects/${projectId}/details`, d))
-        else if (d.id) requests.push(axios.patch(`/api/projects/${projectId}/details/${d.id}`, d))
-      })
+      const modifiedDetails = details.filter(d => d._delete || d._new || d.id)
+      if (modifiedDetails.length > 0) payload.details = modifiedDetails
 
-      // Makes
-      makes.forEach(m => {
-        if (m._delete && m.id) requests.push(axios.delete(`/api/projects/${projectId}/makes/${m.id}`))
-        else if (m._new) requests.push(axios.post(`/api/projects/${projectId}/makes`, m))
-        else if (m.id) requests.push(axios.patch(`/api/projects/${projectId}/makes/${m.id}`, m))
-      })
+      const modifiedMakes = makes.filter(m => m._delete || m._new || m.id)
+      if (modifiedMakes.length > 0) payload.makes = modifiedMakes
 
-      await Promise.all(requests)
+      await axios.post(`/api/projects/${projectId}/data`, payload)
       toast.success("✅ Toutes les modifications ont été sauvegardées !")
       fetchData()
     } catch (err: any) {
-      const message = err.response?.data?.error || "Erreur lors de la sauvegarde d'un ou plusieurs éléments"
+      const message = err.response?.data?.error || "Erreur lors de la sauvegarde"
       toast.error(message)
     } finally {
       setSaving(false)
