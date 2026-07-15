@@ -81,7 +81,8 @@ export default function ProjectDetailPage() {
   }
 
   const handleUpdateResource = (id: number, field: string, value: any) => {
-    setResources(resources.map(r => r.id === id ? { ...r, [field]: value } : r))
+    const parsed = field === 'price_resource' ? Number(value) || 0 : value
+    setResources(resources.map(r => r.id === id ? { ...r, [field]: parsed } : r))
   }
 
   const handleUpdateSpend = (id: number, field: string, value: string) => {

@@ -49,7 +49,7 @@ export function TableHeaderComponent({ resources, onAddResource, onDeleteResourc
                   type="number"
                   className="w-full bg-transparent text-right font-black text-sm text-success focus:outline-none"
                   value={r.price_resource}
-                  onChange={(e) => onUpdateResource(r.id, 'price_resource', e.target.value)}
+                  onChange={(e) => onUpdateResource(r.id, 'price_resource', e.target.value === '' ? '0' : e.target.value)}
                 />
                 <span className="text-[10px] font-bold text-success">Ar</span>
               </div>
