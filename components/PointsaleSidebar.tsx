@@ -8,9 +8,7 @@ import {
   Wallet, 
   Settings2, 
   User, 
-  Trash2, 
   Bell, 
-  Moon, 
   Palette, 
   HelpCircle, 
   ChevronLeft, 
@@ -25,7 +23,6 @@ const menuItems = [
   { title: 'Dashboard', url: '/budget/dashboard', icon: LayoutDashboard },
   { title: 'Transaction', url: '/budget/transaction', icon: Wallet },
   { title: 'Réglages', url: '/budget/settings', icon: Settings2 },
-  { title: 'Corbeille', url: '/budget/trash', icon: Trash2 },
 ]
 
 const prefItems = [

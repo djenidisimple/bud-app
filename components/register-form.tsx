@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff, Loader2, User, Lock } from "lucide-react"
+import axios from "axios"
 import { toast } from "sonner"
 
 export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
@@ -15,6 +16,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const { register } = useAuth()
+  const isAdmin = !onSuccess
 
   const getStrength = (pwd: string) => {
     let score = 0
@@ -52,9 +54,14 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
     }
     setLoading(true)
     try {
-      await register(name, password)
-      toast.success("Inscription réussie")
-      if (onSuccess) onSuccess()
+      if (onSuccess) {
+        await axios.post('/api/auth/register', { name, password })
+        toast.success("Utilisateur créé avec succès")
+        onSuccess()
+      } else {
+        await register(name, password)
+        toast.success("Inscription réussie")
+      }
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Erreur d'inscription")
     } finally {
