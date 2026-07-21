@@ -59,7 +59,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#dfe1e7] p-6 space-y-6 font-sans text-[#1f2229]">
       <header className="flex flex-col gap-2 mb-8">
         <h1 className="text-2xl font-bold m-0">
-          Mon <span className="text-[#4f5bd5]">Profil</span>
+          Mon <span className="text-[#2563EB]">Profil</span>
         </h1>
         <p className="text-sm text-[#6b7078] m-0">
           Gérez vos informations personnelles et vos préférences de compte.
@@ -71,12 +71,12 @@ export default function ProfilePage() {
           <div className="p-6 flex flex-col items-center text-center space-y-4">
             <div className="relative group">
               <Avatar className="h-24 w-24 rounded-full border-4 border-white shadow-sm relative">
-                <AvatarFallback className="text-3xl font-bold text-[#4f5bd5] bg-[#eef0fd]">{initials}</AvatarFallback>
+                <AvatarFallback className="text-3xl font-bold text-[#2563EB] bg-[#DBEAFE]">{initials}</AvatarFallback>
               </Avatar>
             </div>
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-[#1f2229]">{user.name}</h2>
-              <p className="text-xs font-bold text-[#4f5bd5] uppercase tracking-wider">Membre Premium</p>
+              <p className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">Membre Premium</p>
             </div>
             <div className="w-full pt-6 border-t border-[#e6e7eb]">
               <div className="flex items-center justify-center gap-2 text-xs font-medium text-[#6b7078] uppercase">
@@ -91,12 +91,12 @@ export default function ProfilePage() {
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-[#1f2229] flex items-center gap-2">
-                <User className="h-5 w-5 text-[#4f5bd5]" />
+                <User className="h-5 w-5 text-[#2563EB]" />
                 Détails du compte
               </h3>
               {editing ? (
                 <div className="flex items-center gap-2">
-                  <Button onClick={handleSave} disabled={saving} className="h-9 px-4 rounded-xl bg-[#4f5bd5] text-white font-bold hover:bg-[#3f4bb5] text-xs">
+                  <Button onClick={handleSave} disabled={saving} className="h-9 px-4 rounded-xl bg-[#2563EB] text-white font-bold hover:bg-[#1D4ED8] text-xs">
                     {saving ? <Loader2 className="animate-spin h-3 w-3 mr-1" /> : <Save className="h-3 w-3 mr-1" />}
                     Sauvegarder
                   </Button>
@@ -105,7 +105,7 @@ export default function ProfilePage() {
                   </Button>
                 </div>
               ) : (
-                <Button onClick={handleEdit} className="h-9 px-4 rounded-xl bg-[#4f5bd5] text-white font-bold hover:bg-[#3f4bb5] text-xs">
+                <Button onClick={handleEdit} className="h-9 px-4 rounded-xl bg-[#2563EB] text-white font-bold hover:bg-[#1D4ED8] text-xs">
                   <Edit3 className="h-3 w-3 mr-1" /> Modifier
                 </Button>
               )}

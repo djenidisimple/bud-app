@@ -15,7 +15,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white border border-[#e6e7eb] shadow-sm rounded-2xl overflow-hidden">
         <div className="text-center pt-10 pb-6 px-10">
           <div className="flex justify-center mb-6">
-            <div className="flex aspect-square size-16 items-center justify-center rounded-2xl bg-[#4f5bd5] text-white shadow-sm transform rotate-3 hover:rotate-0 transition-transform duration-300">
+            <div className="flex aspect-square size-16 items-center justify-center rounded-2xl bg-[#2563EB] text-white shadow-sm transform rotate-3 hover:rotate-0 transition-transform duration-300">
               <GalleryVerticalEnd className="size-8" />
             </div>
           </div>
@@ -43,7 +43,7 @@ export default function LoginPage() {
                   Vous n'avez pas encore de compte ?{" "}
                   <Button 
                     variant="link" 
-                    className="text-[#4f5bd5] font-bold hover:no-underline p-0" 
+                    className="text-[#2563EB] font-bold hover:no-underline p-0" 
                     onClick={() => setMode("register")}
                   >
                     S&apos;inscrire maintenant
@@ -57,7 +57,7 @@ export default function LoginPage() {
                   Déjà un membre ?{" "}
                   <Button 
                     variant="link" 
-                    className="text-[#4f5bd5] font-bold hover:no-underline p-0" 
+                    className="text-[#2563EB] font-bold hover:no-underline p-0" 
                     onClick={() => setMode("login")}
                   >
                     Se connecter

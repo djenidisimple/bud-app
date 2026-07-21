@@ -12,7 +12,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md bg-white border border-[#e6e7eb] shadow-sm rounded-2xl overflow-hidden">
         <div className="text-center pt-10 pb-6 px-10">
           <div className="flex justify-center mb-6">
-            <div className="flex aspect-square size-16 items-center justify-center rounded-2xl bg-[#4f5bd5] text-white shadow-sm transform rotate-3">
+            <div className="flex aspect-square size-16 items-center justify-center rounded-2xl bg-[#2563EB] text-white shadow-sm transform rotate-3">
                <GalleryVerticalEnd className="size-8" />
             </div>
           </div>
@@ -29,7 +29,7 @@ export default function RegisterPage() {
             <Button 
               variant="ghost" 
               asChild 
-              className="text-[#6b7078] font-medium hover:text-[#4f5bd5] transition-colors"
+              className="text-[#6b7078] font-medium hover:text-[#2563EB] transition-colors"
             >
               <Link href="/budget/settings" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />

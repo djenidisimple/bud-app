@@ -64,7 +64,7 @@ export function PointsaleSidebar() {
           "flex gap-3 p-4 border-b border-[#e6e7eb] min-w-[280px] md:min-w-0",
           collapsed ? "md:flex-col md:items-center md:px-0" : "items-center"
         )}>
-          <div className="w-8 h-8 rounded-lg bg-[#eef0fd] flex items-center justify-center text-[#4f5bd5] shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-[#DBEAFE] flex items-center justify-center text-[#2563EB] shrink-0">
             <Layers className="size-5" />
           </div>
           {!collapsed && (
@@ -163,7 +163,7 @@ export function PointsaleSidebar() {
           "p-4 border-t border-[#e6e7eb] flex items-center gap-3 min-w-[280px] md:min-w-0",
           collapsed && "md:justify-center"
         )}>
-          <div className="w-8 h-8 rounded-full bg-[#eef0fd] text-[#4f5bd5] flex items-center justify-center font-bold text-xs shrink-0 border-2 border-white shadow-sm">
+          <div className="w-8 h-8 rounded-full bg-[#DBEAFE] text-[#2563EB] flex items-center justify-center font-bold text-xs shrink-0 border-2 border-white shadow-sm">
             {userInitial}
           </div>
           {!collapsed && (

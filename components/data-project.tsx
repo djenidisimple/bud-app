@@ -66,7 +66,7 @@ export function DataProject() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin h-8 w-8 text-[#4f5bd5]" />
+        <Loader2 className="animate-spin h-8 w-8 text-[#2563EB]" />
       </div>
     )
   }
@@ -80,7 +80,7 @@ export function DataProject() {
         </div>
         <button 
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#4f5bd5] text-white text-sm font-bold rounded-xl hover:bg-[#3d48b3] transition-all shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-[#2563EB] text-white text-sm font-bold rounded-xl hover:bg-[#1D4ED8] transition-all shadow-sm"
         >
           <Plus className="size-4" />
           Nouveau projet
@@ -89,14 +89,14 @@ export function DataProject() {
 
       {projects.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#e6e7eb] p-12 flex flex-col items-center justify-center text-center shadow-sm">
-          <div className="w-16 h-16 rounded-full bg-[#eef0fd] text-[#4f5bd5] flex items-center justify-center mb-4">
+          <div className="w-16 h-16 rounded-full bg-[#DBEAFE] text-[#2563EB] flex items-center justify-center mb-4">
             <Wallet className="size-8" />
           </div>
           <p className="text-xl font-bold text-[#1f2229] mb-1">Aucun projet</p>
           <p className="text-sm text-[#6b7078] mb-6">Créez votre premier projet budgétaire pour commencer</p>
           <button 
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-6 py-2 bg-[#4f5bd5] text-white text-sm font-bold rounded-xl hover:bg-[#3d48b3] transition-all shadow-sm"
+            className="flex items-center gap-2 px-6 py-2 bg-[#2563EB] text-white text-sm font-bold rounded-xl hover:bg-[#1D4ED8] transition-all shadow-sm"
           >
             <Plus className="size-4" />
             Créer un projet
@@ -132,7 +132,7 @@ export function DataProject() {
               </p>
               <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
                 <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cliquez pour gérer</span>
-                <div className="size-6 rounded-full bg-[#eef0fd] text-[#4f5bd5] flex items-center justify-center">
+                <div className="size-6 rounded-full bg-[#DBEAFE] text-[#2563EB] flex items-center justify-center">
                   <Wallet className="size-3" />
                 </div>
               </div>

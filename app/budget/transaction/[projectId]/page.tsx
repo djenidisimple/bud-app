@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
+import dynamic from "next/dynamic"
 import { useParams } from "next/navigation"
 import axios from "axios"
 import { Button } from "@/components/ui/button"
@@ -8,14 +9,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableFooter, TableRow, TableCell } from "@/components/ui/table"
 import { TableHeaderComponent } from "@/components/table-header"
 import { TableBodySpend } from "@/components/table-body-spend"
-import { PDFExportButton } from "@/components/showPdf"
-import { ExcelExportButton } from "@/components/ExcelExport"
 import { addResource, addSpend, addDetail } from "@/components/addInput"
 import { calculateRemainingResources, formatNumber } from "@/lib/utils"
 import { Save, Loader2, LayoutDashboard, FileText } from "lucide-react"
 import { toast } from "sonner"
 
 import type { Project as ProjectType, Resource as ResourceType, Spend as SpendType, Detail as DetailType, Make as MakeType } from "@/types"
+
+const PDFExportButton = dynamic(() => import("@/components/showPdf").then(m => m.PDFExportButton), { ssr: false })
+const ExcelExportButton = dynamic(() => import("@/components/ExcelExport").then(m => m.ExcelExportButton), { ssr: false })
 
 export default function ProjectDetailPage() {
   const { projectId } = useParams()
@@ -133,7 +135,7 @@ export default function ProjectDetailPage() {
     return (
       <div className="flex items-center justify-center h-screen bg-[#dfe1e7]">
         <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#4f5bd5]" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2563EB]" />
           <p className="text-[#6b7078] animate-pulse font-medium">Chargement du projet...</p>
         </div>
       </div>
@@ -154,7 +156,7 @@ export default function ProjectDetailPage() {
     <div className="min-h-screen bg-[#dfe1e7] p-6 space-y-6 font-sans text-[#1f2229]">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-2xl shadow-sm border border-[#e6e7eb]">
         <div className="space-y-2">
-          <div className="flex items-center gap-3 text-[#4f5bd5] font-bold text-xs uppercase tracking-wider">
+          <div className="flex items-center gap-3 text-[#2563EB] font-bold text-xs uppercase tracking-wider">
             <LayoutDashboard className="h-4 w-4" />
             <span>Gestion Budgétaire</span>
           </div>
@@ -163,25 +165,29 @@ export default function ProjectDetailPage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <div className="flex items-center gap-2 mr-2">
-            <PDFExportButton
-              project={project}
-              resources={resources.filter(r => !r._delete)}
-              spends={spends.filter(s => !s._delete)}
-              details={details.filter(d => !d._delete)}
-              makes={makes.filter(m => !m._delete)}
-            />
-            <ExcelExportButton
-              project={project}
-              resources={resources.filter(r => !r._delete)}
-              spends={spends.filter(s => !s._delete)}
-              details={details.filter(d => !d._delete)}
-              makes={makes.filter(m => !m._delete)}
-            />
+            <Suspense fallback={<Button variant="outline" disabled>Export...</Button>}>
+              <PDFExportButton
+                project={project}
+                resources={resources.filter(r => !r._delete)}
+                spends={spends.filter(s => !s._delete)}
+                details={details.filter(d => !d._delete)}
+                makes={makes.filter(m => !m._delete)}
+              />
+            </Suspense>
+            <Suspense fallback={<Button variant="outline" disabled>Export...</Button>}>
+              <ExcelExportButton
+                project={project}
+                resources={resources.filter(r => !r._delete)}
+                spends={spends.filter(s => !s._delete)}
+                details={details.filter(d => !d._delete)}
+                makes={makes.filter(m => !m._delete)}
+              />
+            </Suspense>
           </div>
           <Button 
             onClick={handleSave} 
             disabled={saving}
-            className="h-12 px-8 rounded-xl bg-[#4f5bd5] text-white font-bold hover:bg-[#3f4bb5] transition-all flex items-center gap-2"
+            className="h-12 px-8 rounded-xl bg-[#2563EB] text-white font-bold hover:bg-[#1D4ED8] transition-all flex items-center gap-2"
           >
             {saving ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
             {saving ? "Sauvegarde..." : "Enregistrer les modifications"}
@@ -189,94 +195,99 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-[#e6e7eb] shadow-sm rounded-2xl overflow-hidden">
+      <div className="bg-white border border-[#e6e7eb] shadow-sm rounded-2xl">
         <div className="pb-6 bg-gray-50 border-b border-[#e6e7eb] px-6">
           <div className="flex items-center justify-between">
             <div className="text-lg font-bold text-[#1f2229] flex items-center gap-3">
-              <FileText className="h-6 w-6 text-[#4f5bd5]" />
+              <FileText className="h-6 w-6 text-[#2563EB]" />
               Tableau d'Allocation
             </div>
             <div className="flex items-center gap-4 text-sm font-bold">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#1a9e6f]" />
+                <div className="w-3 h-3 rounded-full bg-[#059669]" />
                 <span className="text-[#6b7078]">Ressources</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#d5504f]" />
+                <div className="w-3 h-3 rounded-full bg-[#DC2626]" />
                 <span className="text-[#6b7078]">Dépenses</span>
               </div>
             </div>
           </div>
         </div>
-        <div className="p-0">
-          <div className="overflow-auto">
-            <Table>
-              <TableHeaderComponent
-                resources={resources.filter(r => !r._delete)}
-                onAddResource={handleAddResource}
-                onDeleteResource={handleDeleteResource}
-                onUpdateResource={handleUpdateResource}
-              />
-              <TableBodySpend
-                spends={spends.filter(s => !s._delete)}
-                details={details.filter(d => !d._delete)}
-                makes={makes.filter(m => !m._delete)}
-                resources={resources.filter(r => !r._delete)}
-                onAddSpend={handleAddSpend}
-                onDeleteSpend={handleDeleteSpend}
-                onAddDetail={handleAddDetail}
-                onDeleteDetail={handleDeleteDetail}
-                onMakeChange={handleMakeChange}
-                onUpdateSpend={handleUpdateSpend}
-                onUpdateDetail={handleUpdateDetail}
-              />
-              <TableFooter className="bg-gray-50 border-t-2 border-[#e6e7eb]">
-                <TableRow className="hover:bg-transparent">
-                  <TableCell className="font-bold text-[#1f2229] py-6 px-6 uppercase text-xs tracking-wider">
-                    Total Ressources
+        <div className="overflow-x-auto">
+          <Table className="min-w-[800px]">
+            <colgroup>
+              <col className="w-[250px] min-w-[220px]" />
+              {resources.filter(r => !r._delete).map(r => (
+                <col key={r.id} className="min-w-[180px]" />
+              ))}
+              <col className="min-w-[120px]" />
+            </colgroup>
+            <TableHeaderComponent
+              resources={resources.filter(r => !r._delete)}
+              onAddResource={handleAddResource}
+              onDeleteResource={handleDeleteResource}
+              onUpdateResource={handleUpdateResource}
+            />
+            <TableBodySpend
+              spends={spends.filter(s => !s._delete)}
+              details={details.filter(d => !d._delete)}
+              makes={makes.filter(m => !m._delete)}
+              resources={resources.filter(r => !r._delete)}
+              onAddSpend={handleAddSpend}
+              onDeleteSpend={handleDeleteSpend}
+              onAddDetail={handleAddDetail}
+              onDeleteDetail={handleDeleteDetail}
+              onMakeChange={handleMakeChange}
+              onUpdateSpend={handleUpdateSpend}
+              onUpdateDetail={handleUpdateDetail}
+            />
+            <TableFooter className="bg-gray-50 border-t-2 border-[#e6e7eb]">
+              <TableRow className="hover:bg-transparent">
+                <TableCell className="font-bold text-[#1f2229] py-6 px-6 uppercase text-xs tracking-wider">
+                  Total Ressources
+                </TableCell>
+                {remainingResources.map((r) => (
+                  <TableCell key={r.id} className="text-right font-bold text-[#059669] text-base py-6 px-4">
+                    {formatNumber(r.price_resource)} <span className="text-[10px] font-bold">Ar</span>
                   </TableCell>
-                  {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-bold text-[#1a9e6f] text-lg py-6">
-                      {formatNumber(r.price_resource)} <span className="text-[10px]">Ar</span>
-                    </TableCell>
-                  ))}
-                  <TableCell className="text-right font-bold text-[#1a9e6f] text-xl py-6 px-6">
-                    {formatNumber(resourceTotal)} <span className="text-xs">Ar</span>
+                ))}
+                <TableCell className="text-right font-bold text-[#059669] text-lg py-6 px-6">
+                  {formatNumber(resourceTotal)} <span className="text-[10px] font-bold">Ar</span>
+                </TableCell>
+              </TableRow>
+              <TableRow className="hover:bg-transparent">
+                <TableCell className="font-bold text-[#1f2229] py-6 px-6 uppercase text-xs tracking-wider">
+                  Total Dépenses
+                </TableCell>
+                {remainingResources.map((r) => (
+                  <TableCell key={r.id} className="text-right font-bold text-[#DC2626] text-base py-6 px-4">
+                    {formatNumber(r.used)} <span className="text-[10px] font-bold">Ar</span>
                   </TableCell>
-                </TableRow>
-                <TableRow className="hover:bg-transparent">
-                  <TableCell className="font-bold text-[#1f2229] py-6 px-6 uppercase text-xs tracking-wider">
-                    Total Dépenses
-                  </TableCell>
-                  {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-bold text-[#d5504f] text-lg py-6">
-                      {formatNumber(r.used)} <span className="text-[10px]">Ar</span>
-                    </TableCell>
-                  ))}
-                  <TableCell className="text-right font-bold text-[#d5504f] text-xl py-6 px-6">
-                    {formatNumber(spendTotal)} <span className="text-xs">Ar</span>
-                  </TableCell>
-                </TableRow>
-                <TableRow className="hover:bg-transparent bg-[#eef0fd]">
-                  <TableCell className="font-bold text-[#4f5bd5] py-8 px-6 uppercase text-sm tracking-wider">
-                    Solde Restant
-                  </TableCell>
-                  {remainingResources.map((r) => (
-                    <TableCell key={r.id} className="text-right font-bold text-lg py-8">
-                      <span className={`px-3 py-1 rounded-full ${r.remaining < 0 ? "bg-[#d5504f]/10 text-[#d5504f]" : "bg-[#1a9e6f]/10 text-[#1a9e6f]"}`}>
-                        {formatNumber(r.remaining)} <span className="text-[10px]">Ar</span>
-                      </span>
-                    </TableCell>
-                  ))}
-                  <TableCell className="text-right font-bold text-xl py-8 px-6">
-                    <span className={`px-4 py-2 rounded-full ${remainingTotal < 0 ? "bg-[#d5504f]/20 text-[#d5504f]" : "bg-[#1a9e6f]/20 text-[#1a9e6f]"}`}>
-                      {formatNumber(remainingTotal)} <span className="text-xs">Ar</span>
+                ))}
+                <TableCell className="text-right font-bold text-[#DC2626] text-lg py-6 px-6">
+                  {formatNumber(spendTotal)} <span className="text-[10px] font-bold">Ar</span>
+                </TableCell>
+              </TableRow>
+              <TableRow className="hover:bg-transparent bg-[#DBEAFE]">
+                <TableCell className="font-bold text-[#2563EB] py-8 px-6 uppercase text-sm tracking-wider">
+                  Solde Restant
+                </TableCell>
+                {remainingResources.map((r) => (
+                  <TableCell key={r.id} className="text-right font-bold text-base py-8 px-4">
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full ${r.remaining < 0 ? "bg-[#DC2626]/10 text-[#DC2626]" : "bg-[#059669]/10 text-[#059669]"}`}>
+                      {formatNumber(r.remaining)} <span className="text-[10px]">Ar</span>
                     </span>
                   </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </div>
+                ))}
+                <TableCell className="text-right font-bold text-lg py-8 px-6">
+                  <span className={`inline-flex items-center gap-1 px-4 py-2 rounded-full ${remainingTotal < 0 ? "bg-[#DC2626]/20 text-[#DC2626]" : "bg-[#059669]/20 text-[#059669]"}`}>
+                    {formatNumber(remainingTotal)} <span className="text-[10px]">Ar</span>
+                  </span>
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
         </div>
       </div>
     </div>

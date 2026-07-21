@@ -1,6 +1,6 @@
-'use client'
+import dynamic from "next/dynamic"
 
-import { PointsaleSidebar } from "@/components/PointsaleSidebar"
+const PointsaleSidebar = dynamic(() => import("@/components/PointsaleSidebar").then(m => m.PointsaleSidebar))
 
 export default function BudgetLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,4 +12,5 @@ export default function BudgetLayout({ children }: { children: React.ReactNode }
     </div>
   )
 }
+
 

@@ -97,7 +97,7 @@ export default function AttendancePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#dfe2e8]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#4f5bd5]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#2563EB]"></div>
       </div>
     )
   }
@@ -121,7 +121,7 @@ export default function AttendancePage() {
           <StatCard label="Total Projets" value={projects.length.toString()} delta="Tous les projets" deltaColor="text-[#1fbf75]" />
           <StatCard label="Projets Actifs" value={projects.filter(p => p.active === 1).length.toString()} delta="En cours" deltaColor="text-[#1fbf75]" />
           <StatCard label="Projets Inactifs" value={projects.filter(p => p.active === 0).length.toString()} delta="Archivés" deltaColor="text-[#f0483e]" />
-          <StatCard label="Budget Total" value={`${projects.reduce((s, p) => s + (p.totalResource || 0), 0).toLocaleString('fr-FR')} Ar`} delta="Tous projets" deltaColor="text-[#4f5bd5]" />
+          <StatCard label="Budget Total" value={`${projects.reduce((s, p) => s + (p.totalResource || 0), 0).toLocaleString('fr-FR')} Ar`} delta="Tous projets" deltaColor="text-[#2563EB]" />
         </div>
 
         {/* Main Panel */}
@@ -152,7 +152,7 @@ export default function AttendancePage() {
               </button>
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
-                  <button className="flex items-center gap-2 bg-[#4f5bd5] text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-[#4452c7] transition-colors">
+                  <button className="flex items-center gap-2 bg-[#2563EB] text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-[#1D4ED8] transition-colors">
                     <Plus size={14} />
                     Nouveau Projet
                   </button>
@@ -183,7 +183,7 @@ export default function AttendancePage() {
                     <Button
                       onClick={handleCreateProject}
                       disabled={creating}
-                      className="w-full bg-[#4f5bd5] hover:bg-[#4452c7] text-white font-bold"
+                      className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold"
                     >
                       {creating ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
                       {creating ? "Création..." : "Créer le projet"}
@@ -214,7 +214,7 @@ export default function AttendancePage() {
                     <td className="py-3 px-2" onClick={e => e.stopPropagation()}><div className="w-4 h-4 border-[1.5px] border-[#d8dae0] rounded-[5px]"></div></td>
                     <td className="py-3 px-2">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-[#4f5bd5] font-bold text-xs">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-[#2563EB] font-bold text-xs">
                           {p.name_project.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -280,7 +280,7 @@ export default function AttendancePage() {
                     onClick={() => setPage(p)}
                     className={`w-7 h-7 rounded-lg border flex items-center justify-center text-xs font-semibold transition-colors ${
                       page === p
-                        ? 'bg-[#4f5bd5] text-white border-[#4f5bd5]'
+                        ? 'bg-[#2563EB] text-white border-[#2563EB]'
                         : 'border-[#eceef2] bg-white hover:bg-gray-50'
                     }`}
                   >
